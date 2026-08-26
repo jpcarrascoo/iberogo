@@ -12,7 +12,7 @@ export default function Footer() {
           href="https://github.com/REPLACE_ME/iberogo"
           target="_blank"
           rel="noreferrer"
-          className="hover:text-emerald-600"
+          className="hover:text-red-600"
         >
           View on GitHub
         </a>

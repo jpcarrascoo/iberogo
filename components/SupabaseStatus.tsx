@@ -44,8 +44,8 @@ export default function SupabaseStatus() {
     status === "checking"
       ? "bg-black/30 dark:bg-white/30"
       : status === "connected"
-        ? "bg-emerald-600"
-        : "bg-red-500";
+        ? "bg-amber-600"
+        : "bg-amber-500";
 
   return (
     <div className="inline-flex items-center gap-2 rounded-full border border-black/10 px-3 py-1 text-xs font-medium text-black/70 dark:border-white/10 dark:text-white/70">

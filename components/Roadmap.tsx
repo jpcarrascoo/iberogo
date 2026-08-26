@@ -22,7 +22,7 @@ export default function Roadmap() {
               className={
                 "absolute -left-[7px] mt-1.5 h-3 w-3 rounded-full " +
                 (m.status === "current"
-                  ? "bg-emerald-600"
+                  ? "bg-red-600"
                   : "bg-black/20 dark:bg-white/20")
               }
             />
@@ -31,7 +31,7 @@ export default function Roadmap() {
                 {m.week}
               </span>
               {m.status === "current" ? (
-                <span className="rounded-full bg-emerald-600/10 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                <span className="rounded-full bg-red-600/10 px-2 py-0.5 text-xs font-medium text-red-700 dark:text-red-400">
                   In progress
                 </span>
               ) : (
