@@ -1,15 +1,32 @@
 type Milestone = {
   week: string;
   title: string;
-  status: "current" | "planned";
+  status: "done" | "current" | "planned";
 };
 
 const milestones: Milestone[] = [
-  { week: "Week 0", title: "Builder infrastructure: repo, deploy pipeline, Supabase connection", status: "current" },
-  { week: "Week 1", title: "Browse IBERO restaurants & cafeterias and their menus", status: "planned" },
-  { week: "Week 2", title: "Add items to a cart and choose a pickup time", status: "planned" },
-  { week: "Week 3", title: "Order confirmation with order number + restaurant staff order view", status: "planned" },
+  { week: "Week 0", title: "Builder infrastructure: repo, deploy pipeline, Supabase connection", status: "done" },
+  { week: "Week 1", title: "Generative Core Agent: /core turns a free-text order into structured data", status: "current" },
+  { week: "Week 2+", title: "Next course module — scope announced week by week", status: "planned" },
 ];
+
+const DOT_CLASS: Record<Milestone["status"], string> = {
+  done: "bg-black/40 dark:bg-white/40",
+  current: "bg-red-600",
+  planned: "bg-black/20 dark:bg-white/20",
+};
+
+const BADGE_CLASS: Record<Milestone["status"], string> = {
+  done: "bg-black/5 text-black/60 dark:bg-white/10 dark:text-white/50",
+  current: "bg-red-600/10 text-red-700 dark:text-red-400",
+  planned: "bg-black/5 text-black/50 dark:bg-white/10 dark:text-white/40",
+};
+
+const BADGE_LABEL: Record<Milestone["status"], string> = {
+  done: "Done",
+  current: "In progress",
+  planned: "Planned",
+};
 
 export default function Roadmap() {
   return (
@@ -18,27 +35,14 @@ export default function Roadmap() {
       <ol className="relative border-l border-black/10 pl-6 dark:border-white/10">
         {milestones.map((m) => (
           <li key={m.week} className="mb-8 last:mb-0">
-            <span
-              className={
-                "absolute -left-[7px] mt-1.5 h-3 w-3 rounded-full " +
-                (m.status === "current"
-                  ? "bg-red-600"
-                  : "bg-black/20 dark:bg-white/20")
-              }
-            />
+            <span className={`absolute -left-[7px] mt-1.5 h-3 w-3 rounded-full ${DOT_CLASS[m.status]}`} />
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wide text-black/50 dark:text-white/40">
                 {m.week}
               </span>
-              {m.status === "current" ? (
-                <span className="rounded-full bg-red-600/10 px-2 py-0.5 text-xs font-medium text-red-700 dark:text-red-400">
-                  In progress
-                </span>
-              ) : (
-                <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs font-medium text-black/50 dark:bg-white/10 dark:text-white/40">
-                  Planned
-                </span>
-              )}
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${BADGE_CLASS[m.status]}`}>
+                {BADGE_LABEL[m.status]}
+              </span>
             </div>
             <p
               className={
