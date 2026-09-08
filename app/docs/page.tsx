@@ -59,6 +59,45 @@ export default function DocsPage() {
           deterministic first pass, not a finished ordering system.
         </p>
       </section>
+
+      <section className="mt-6 rounded-lg border border-black/10 p-5 dark:border-white/10">
+        <h2 className="text-lg font-semibold">
+          Prompt library — Week 2: Research + Benchmarking
+        </h2>
+        <p className="mt-2 text-sm text-black/70 dark:text-white/60">
+          The <code>/research</code> page is desk research, not a generative
+          feature — every competitor in <code>lib/research.ts</code> is a
+          real product found via web search, with a source link, not
+          AI-invented. Nothing on this page is simulated output.
+        </p>
+
+        <h3 className="mt-4 text-sm font-semibold">What was researched</h3>
+        <ul className="mt-1 list-inside list-disc text-sm text-black/70 dark:text-white/60">
+          <li>
+            5 global campus food pre-ordering products (Grubhub Campus
+            Dining, Tapingo, Transact/GET, Jamezz, HKUST&apos;s own ordering
+            system).
+          </li>
+          <li>
+            4 Mexico-specific competitors (Coco, Infood, Jit Pickup,
+            Drizline — more than the minimum, since Mexico findings ran
+            ahead) plus the real substitute IBEROGO competes with today:
+            students simply arriving early.
+          </li>
+        </ul>
+
+        <h3 className="mt-4 text-sm font-semibold">The most important finding</h3>
+        <p className="mt-1 text-sm text-black/70 dark:text-white/60">
+          Coco, a Mexican campus-ordering platform, publicly lists{" "}
+          <strong>Universidad Iberoamericana</strong> as a client. That
+          doesn&apos;t mean IBEROGO shouldn&apos;t exist — Infood, built by
+          Tec de Monterrey students in 2020, proves students keep building
+          this anyway — but it means the honest next step is asking a real
+          person at IBERO whether they&apos;ve seen it, not assuming the
+          field is empty. See the Human Validation section on{" "}
+          <code>/research</code>.
+        </p>
+      </section>
     </div>
   );
 }
