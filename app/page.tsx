@@ -1,5 +1,6 @@
 import Roadmap from "@/components/Roadmap";
 import SupabaseStatus from "@/components/SupabaseStatus";
+import ResearchWidget from "@/components/ResearchWidget";
 
 export default function Home() {
   return (
@@ -14,6 +15,9 @@ export default function Home() {
           so it&apos;s ready to pick up the moment they get there — no more
           losing half a break standing in line.
         </p>
+        <div className="w-full">
+          <ResearchWidget />
+        </div>
       </div>
 
       <Roadmap />

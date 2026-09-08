@@ -6,8 +6,9 @@ type Milestone = {
 
 const milestones: Milestone[] = [
   { week: "Week 0", title: "Builder infrastructure: repo, deploy pipeline, Supabase connection", status: "done" },
-  { week: "Week 1", title: "Generative Core Agent: /core turns a free-text order into structured data", status: "current" },
-  { week: "Week 2+", title: "Next course module — scope announced week by week", status: "planned" },
+  { week: "Week 1", title: "Generative Core Agent: /core turns a free-text order into structured data", status: "done" },
+  { week: "Week 2", title: "Research + Benchmarking: /research proves the problem is real, tracks competitors and risk", status: "current" },
+  { week: "Week 3+", title: "Next course module — scope announced week by week", status: "planned" },
 ];
 
 const DOT_CLASS: Record<Milestone["status"], string> = {
