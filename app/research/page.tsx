@@ -93,7 +93,6 @@ export default function ResearchPage() {
       </p>
     </div>
     <div>
-      <p className="font-medium">Bonus — reaction to the live site</p>
       <p className="mt-1 text-black/70 dark:text-white/60">
         Found it easy to use and intuitive; thinks students would be able to
         place an order without much difficulty.
@@ -101,12 +100,7 @@ export default function ResearchPage() {
     </div>
   </div>
 </div>
+      </section>
 
       <section className="mt-12">
         <h2 className="mb-4 text-lg font-semibold">Add a research note</h2>
-        <ResearchIntake onSaved={() => setRefreshKey((k) => k + 1)} />
-        <SavedResearch refreshKey={refreshKey} />
-      </section>
-    </div>
-  );
-}
