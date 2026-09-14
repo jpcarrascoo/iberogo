@@ -58,31 +58,49 @@ export default function ResearchPage() {
         <h2 className="mb-4 text-lg font-semibold">
           Human validation conversation
         </h2>
-        <div className="rounded-lg border border-dashed border-black/20 p-4 text-sm dark:border-white/20">
-          <p className="font-medium">
-            [ Replace this with one real conversation — see the questions
-            below ]
-          </p>
-          <p className="mt-2 text-black/60 dark:text-white/50">
-            Ask a real IBERO student (or someone who works at a campus
-            restaurant/cafeteria):
-          </p>
-          <ol className="mt-2 list-inside list-decimal space-y-1 text-black/60 dark:text-white/50">
-            <li>Have you ever used an app to order food ahead at IBERO or anywhere else?</li>
-            <li>
-              Have you heard of Coco, Jit Pickup, or any other pre-order app
-              being used here specifically?
-            </li>
-            <li>What would make you actually use something like this, versus just walking up?</li>
-          </ol>
-          <p className="mt-2 text-black/60 dark:text-white/50">
-            Then replace this box with: who you talked to (first name or
-            role is enough), the date, and what they actually said — even if
-            it complicates the pitch. A validation conversation that only
-            confirms what you already believed isn&apos;t doing its job.
-          </p>
-        </div>
-      </section>
+        <div className="rounded-lg border border-black/10 bg-black/5 p-4 text-sm dark:border-white/10 dark:bg-white/5">
+  <p className="text-black/60 dark:text-white/50">
+    Talked to: a real IBERO student — September 14, 2026
+  </p>
+  <div className="mt-4 space-y-4">
+    <div>
+      <p className="font-medium">
+        1. Have you ever used an app to order food ahead at IBERO or anywhere else?
+      </p>
+      <p className="mt-1 text-black/70 dark:text-white/60">
+        No, never used one at IBERO, but would definitely like to — it would
+        help save time between classes and avoid long lines.
+      </p>
+    </div>
+    <div>
+      <p className="font-medium">
+        2. Have you heard of Coco, Jit Pickup, or any other pre-order app being
+        used here specifically?
+      </p>
+      <p className="mt-1 text-black/70 dark:text-white/60">
+        No — hadn&apos;t heard of any of those being used at IBERO.
+      </p>
+    </div>
+    <div>
+      <p className="font-medium">
+        3. What would make you actually use something like this, versus just
+        walking up?
+      </p>
+      <p className="mt-1 text-black/70 dark:text-white/60">
+        Ease of use, clear menus and prices, and being able to choose pickup
+        time and location. Ordering the way you&apos;d text a friend would
+        make it more convenient — especially during busy hours.
+      </p>
+    </div>
+    <div>
+      <p className="font-medium">Bonus — reaction to the live site</p>
+      <p className="mt-1 text-black/70 dark:text-white/60">
+        Found it easy to use and intuitive; thinks students would be able to
+        place an order without much difficulty.
+      </p>
+    </div>
+  </div>
+</div>
 
       <section className="mt-12">
         <h2 className="mb-4 text-lg font-semibold">Add a research note</h2>
