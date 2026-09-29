@@ -1,6 +1,7 @@
 import Roadmap from "@/components/Roadmap";
 import SupabaseStatus from "@/components/SupabaseStatus";
 import ResearchWidget from "@/components/ResearchWidget";
+import PricingWidget from "@/components/PricingWidget";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
         </p>
         <div className="w-full">
           <ResearchWidget />
+          <PricingWidget />
         </div>
       </div>
 
