@@ -7,14 +7,14 @@ export default function ProductPage() {
   const built = FEATURES.filter((f) => f.status === "Built").length;
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10 text-zinc-100">
+    <main className="mx-auto max-w-5xl px-4 py-10 text-black dark:text-white">
       <header className="mb-10">
         <h1 className="text-3xl font-semibold tracking-tight">Product architecture</h1>
-        <p className="mt-3 max-w-2xl text-zinc-400">
+        <p className="mt-3 max-w-2xl text-black/60 dark:text-white/60">
           What IBEROGO is made of, who each feature is for, and what is live today. {built} of {FEATURES.length}{" "}
           features are built; the rest are roadmap and are marked that way.
         </p>
-        <Link href="/pricing" className="mt-4 inline-block text-emerald-400 underline underline-offset-4 hover:text-emerald-300">
+        <Link href="/pricing" className="mt-4 inline-block text-red-700 dark:text-red-400 underline underline-offset-4 hover:text-red-600">
           See how the tiers are priced
         </Link>
       </header>
@@ -23,9 +23,9 @@ export default function ProductPage() {
         <h2 id="map-heading" className="mb-4 text-xl font-semibold">
           Feature map
         </h2>
-        <div className="overflow-x-auto rounded-lg border border-zinc-800">
+        <div className="overflow-x-auto rounded-lg border border-black/10 dark:border-white/10">
           <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="bg-zinc-900 text-zinc-300">
+            <thead className="bg-black/5 dark:bg-white/5 text-black/75 dark:text-white/75">
               <tr>
                 <th scope="col" className="px-4 py-3 font-medium">Feature</th>
                 <th scope="col" className="px-4 py-3 font-medium">Status</th>
@@ -36,11 +36,11 @@ export default function ProductPage() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800">
+            <tbody className="divide-y divide-black/10 dark:divide-white/10">
               {FEATURES.map((f) => (
                 <tr key={f.name} className="align-top">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-zinc-100">
+                    <div className="font-medium text-black dark:text-white">
                       {f.link ? (
                         <Link href={f.link} className="hover:underline">
                           {f.name}
@@ -49,28 +49,28 @@ export default function ProductPage() {
                         f.name
                       )}
                     </div>
-                    <div className="mt-1 text-zinc-400">{f.description}</div>
+                    <div className="mt-1 text-black/60 dark:text-white/60">{f.description}</div>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
                     <span
                       className={
                         f.status === "Built"
-                          ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-300"
-                          : "rounded-full border border-zinc-700 px-2.5 py-1 text-xs font-medium text-zinc-400"
+                          ? "rounded-full bg-green-700/10 px-2.5 py-1 text-xs font-medium text-green-700 dark:text-green-400"
+                          : "rounded-full border border-black/15 dark:border-white/20 px-2.5 py-1 text-xs font-medium text-black/60 dark:text-white/60"
                       }
                     >
                       {f.status}
                     </span>
-                    <div className="mt-2 text-xs text-zinc-500">{f.week}</div>
+                    <div className="mt-2 text-xs text-black/50 dark:text-white/45">{f.week}</div>
                   </td>
                   {TIER_COLUMNS.map((t) => (
                     <td key={t} className="px-3 py-3 text-center">
                       {f.tiers.includes(t) ? (
-                        <span aria-label={`Included in ${t}`} className="text-emerald-400">
+                        <span aria-label={`Included in ${t}`} className="text-red-700 dark:text-red-400">
                           ✓
                         </span>
                       ) : (
-                        <span aria-label={`Not in ${t}`} className="text-zinc-700">
+                        <span aria-label={`Not in ${t}`} className="text-black/25 dark:text-white/25">
                           –
                         </span>
                       )}
@@ -81,7 +81,7 @@ export default function ProductPage() {
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-sm text-zinc-500">
+        <p className="mt-3 text-sm text-black/50 dark:text-white/45">
           Internal tools (research dashboard, pricing simulator) belong to no paid tier.
         </p>
       </section>
@@ -92,17 +92,17 @@ export default function ProductPage() {
         </h2>
         <div className="grid gap-4 md:grid-cols-2">
           {SEGMENTS.map((s) => (
-            <article key={s.name} className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-5">
+            <article key={s.name} className="rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/[0.04] p-5">
               <h3 className="text-lg font-semibold">{s.name}</h3>
-              <p className="mt-2 text-zinc-400">{s.who}</p>
-              <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-zinc-300">
+              <p className="mt-2 text-black/60 dark:text-white/60">{s.who}</p>
+              <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-black/75 dark:text-white/75">
                 {s.gets.map((g) => (
                   <li key={g}>{g}</li>
                 ))}
               </ul>
-              <p className="mt-4 border-t border-zinc-800 pt-3 text-sm">
-                <span className="text-zinc-500">Pays: </span>
-                <span className="font-medium text-zinc-100">{s.pays}</span>
+              <p className="mt-4 border-t border-black/10 dark:border-white/10 pt-3 text-sm">
+                <span className="text-black/50 dark:text-white/45">Pays: </span>
+                <span className="font-medium text-black dark:text-white">{s.pays}</span>
               </p>
             </article>
           ))}

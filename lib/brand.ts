@@ -71,9 +71,9 @@ export const DONTS = [
   "Don't add a second accent color.",
 ];
 
-export const KNOWN_INCONSISTENCIES: string[] = [
-  "/pricing (Week 3) still uses emerald accents instead of Rojo GO — to migrate in a later week.",
-];
+// Week 4 fix: /pricing and /product (Week 3) used hard-coded dark colors and an emerald
+// accent, which made them nearly unreadable in light mode. Both now use the brand tokens.
+export const KNOWN_INCONSISTENCIES: string[] = [];
 
 // --- WCAG contrast -----------------------------------------------------------
 
