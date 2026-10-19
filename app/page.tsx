@@ -2,25 +2,31 @@ import Roadmap from "@/components/Roadmap";
 import SupabaseStatus from "@/components/SupabaseStatus";
 import ResearchWidget from "@/components/ResearchWidget";
 import PricingWidget from "@/components/PricingWidget";
+import MarketingWidget from "@/components/MarketingWidget";
+import LandingHome from "@/components/LandingHome";
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24">
-      <div className="flex flex-col items-start gap-4">
-        <SupabaseStatus />
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          Skip the line at IBERO.
-        </h1>
-        <p className="max-w-xl text-lg text-black/70 dark:text-white/70">
-          IBEROGO lets IBERO students order and pay for food ahead of time,
-          so it&apos;s ready to pick up the moment they get there — no more
-          losing half a break standing in line.
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
+      <LandingHome />
+
+      {/* Builder log: the course evidence, kept below the student-facing landing page */}
+      <section aria-labelledby="buildlog-h" className="border-t border-black/10 pt-12 dark:border-white/10">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 id="buildlog-h" className="text-xl font-semibold">
+            Build log
+          </h2>
+          <SupabaseStatus />
+        </div>
+        <p className="mt-1 text-sm text-black/60 dark:text-white/50">
+          IBEROGO is being built week by week in the IBERO Build Discipline course. Here&apos;s the evidence so far.
         </p>
-        <div className="w-full">
+        <div className="mt-4">
           <ResearchWidget />
           <PricingWidget />
+          <MarketingWidget />
         </div>
-      </div>
+      </section>
 
       <Roadmap />
     </div>
