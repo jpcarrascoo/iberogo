@@ -9,6 +9,7 @@ const links = [
   { href: "/research", label: "Research" },
   { href: "/product", label: "Product" },
   { href: "/pricing", label: "Pricing" },
+  { href: "/marketing", label: "Marketing" },
   { href: "/docs", label: "Docs" },
 ];
 
@@ -17,11 +18,11 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-white/90 backdrop-blur dark:border-white/10 dark:bg-black/80">
-      <nav className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4 sm:px-6">
-        <Link href="/" className="text-lg font-bold tracking-tight">
+      <nav className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+        <Link href="/" className="shrink-0 text-lg font-bold tracking-tight">
           IBERO<span className="text-red-600">GO</span>
         </Link>
-        <ul className="flex items-center gap-6 text-sm font-medium">
+        <ul className="-mx-1 flex items-center gap-4 overflow-x-auto px-1 text-sm font-medium whitespace-nowrap sm:gap-6">
           {links.map((link) => {
             const isActive = pathname === link.href;
             return (
