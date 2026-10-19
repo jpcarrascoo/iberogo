@@ -9,7 +9,8 @@ const milestones: Milestone[] = [
   { week: "Week 1", title: "Generative Core Agent: /core turns a free-text order into structured data", status: "done" },
   { week: "Week 2", title: "Research + Benchmarking: /research proves the problem is real, tracks competitors and risk", status: "done" },
   { week: "Week 3", title: "Product + Pricing: /product maps features to tiers, /pricing simulates revenue from students and vendors", status: "done" },
-  { week: "Week 4+", title: "Next course module — scope announced week by week", status: "planned" },
+  { week: "Week 4", title: "Marketing Engine: /marketing brand system, persona, 10 posts, 3 scripts, 14-day calendar, A/B tests; homepage becomes a landing page", status: "current" },
+  { week: "Week 5+", title: "Next course module — scope announced week by week", status: "planned" },
 ];
 
 const DOT_CLASS: Record<Milestone["status"], string> = {

@@ -98,6 +98,53 @@ export default function DocsPage() {
           <code>/research</code>.
         </p>
       </section>
+
+      <section className="mt-6 rounded-lg border border-black/10 p-5 dark:border-white/10">
+        <h2 className="text-lg font-semibold">
+          Prompt library — Week 4: Marketing Engine + Content System
+        </h2>
+        <p className="mt-2 text-sm text-black/70 dark:text-white/60">
+          The <code>/marketing</code> content (brand system, persona, landing
+          copy, 10 posts, 3 video scripts, 14-day calendar) was{" "}
+          <strong>drafted with an AI coding assistant</strong> and is stored
+          as fixed data in <code>lib/brand.ts</code> and{" "}
+          <code>lib/marketing.ts</code>. There is no live AI call and nothing
+          posts automatically — free tools only.
+        </p>
+
+        <h3 className="mt-4 text-sm font-semibold">What the drafts were given</h3>
+        <ul className="mt-1 list-inside list-disc text-sm text-black/70 dark:text-white/60">
+          <li>The Week 1 value proposition (the three alternatives students already try).</li>
+          <li>The Week 2 research, including the Coco finding.</li>
+          <li>The Week 3 tiers and prices.</li>
+          <li>
+            Two real student conversations (Sept 14 and Sept 28, 2026). Both
+            said the same two things matter: ordering the way you&apos;d text a
+            friend, and choosing your own pickup time and place.
+          </li>
+        </ul>
+
+        <h3 className="mt-4 text-sm font-semibold">Rules the drafts must follow</h3>
+        <ul className="mt-1 list-inside list-disc text-sm text-black/70 dark:text-white/60">
+          <li>Spanish for students, with an English line for the course.</li>
+          <li>No invented numbers or testimonials; real quotes are paraphrased, dated and anonymous.</li>
+          <li>No launch claims (&quot;pide ya&quot;, &quot;ya disponible&quot;) while ordering isn&apos;t live — logic check 11 enforces this.</li>
+          <li>
+            The <code>/core</code> demo only understands English orders, so
+            every demo example in the copy is English and says so — logic
+            check 12 runs that exact example through the real parser.
+          </li>
+          <li>Never imply IBEROGO is official Universidad Iberoamericana.</li>
+        </ul>
+
+        <h3 className="mt-4 text-sm font-semibold">How the message gets chosen</h3>
+        <p className="mt-1 text-sm text-black/70 dark:text-white/60">
+          Two A/B tests are run in person with real IBERO students (at least 5
+          per test), and votes are saved to Supabase (<code>ab_votes</code>).
+          The Test 1 winner becomes the homepage headline by changing{" "}
+          <code>HOMEPAGE_HEADLINE</code> in <code>lib/marketing.ts</code>.
+        </p>
+      </section>
     </div>
   );
 }
