@@ -104,6 +104,8 @@ export const R = {
     "I still couldn't read an order there, so I've flagged this chat for a person on the IBEROGO team to look at. You can keep asking me questions, or press Start over.",
   q2: "2/3 · When do you want to pick it up? (e.g. 1:00 PM)",
   q2Retry: "I didn't catch a time. Try something like 12:30 or 1 PM.",
+  q2LooksLikeFood: (order: string) =>
+    `That looks like food, not a time. Your order so far is ${order || "empty"}; press Start over if you want to change it. When do you want to pick it up? (e.g. 1:00 PM)`,
   q2ConfirmPrompt: "Please answer Yes, or type a different time.",
   q3: "3/3 · Where do you want to pick it up? Choose a point or type one.",
   q3Retry: "Please choose a pickup point, or type a short place name.",
@@ -312,7 +314,15 @@ function formatTime(hour24: number, minute: number): string {
 
 /** Same assumptions as the Week 1 parser: "at 1" with no am/pm means 1 PM (lunch app). */
 export function parseTimeAnswer(text: string): string | null {
-  const t = text.toLowerCase().trim();
+  // Week 5 fix (found in Software Test 3): "2 tacos" at the time question used to be read
+  // as 2:00 PM. Now the answer must be ONLY a time, after removing filler words.
+  const t = text
+    .toLowerCase()
+    .replace(/[?!.,]+/g, " ")
+    .replace(/\b(pick ?up|at|around|about|by|maybe|like|please|ish|o'?clock|today)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!/^(noon|\d{1,2}(:\d{2})?\s*(am|pm|a\.m|p\.m)?)$/.test(t)) return null;
   if (/\bnoon\b/.test(t)) return formatTime(12, 0);
   const m = t.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm|a\.m\.|p\.m\.)?\b/);
   if (!m) return null;
@@ -404,6 +414,18 @@ export function cleanOrderText(text: string): string {
     .trim();
 }
 
+const SENSITIVE_CLAUSE_RE =
+  /\b(card|credit|debit|cvv|cvc|expiry|expiration|phone|number|cell|whatsapp|email|e-mail|mail me|text me|call me)\b/i;
+
+/** Removes the clauses that were about card numbers, phones or emails (their data is already redacted). */
+export function dropSensitiveClauses(text: string): string {
+  return text
+    .split(/[,.;!]| and | but /i)
+    .map((s) => s.trim())
+    .filter((s) => s && !SENSITIVE_CLAUSE_RE.test(s))
+    .join(", ");
+}
+
 /** Removes the clauses that mention an allergy so the parser doesn't read them as menu items. */
 function splitAllergy(text: string): { rest: string; note: string | null } {
   const parts = text.split(/[,.;!]| and | but /i).map((s) => s.trim()).filter(Boolean);
@@ -445,6 +467,12 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
 
   // The rest of the flow only ever sees the redacted text.
   let text = shownText.replace(/\[(card number|email|phone) removed\]|\b(cvv|cvc) \[removed\]/gi, "").trim();
+
+  // Week 5 fix (found in Software Test 3): after a card number is removed, the leftover
+  // words ("my card is") used to be read as a menu item. Drop those clauses.
+  if (flags.includes("G2_payment") || flags.includes("G3_personal_data")) {
+    text = dropSensitiveClauses(text);
+  }
 
   if (flags.includes("G1_allergy")) {
     const { rest, note } = splitAllergy(text);
@@ -535,7 +563,7 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
     case "q2_time": {
       const t = parseTimeAnswer(text);
       if (!t) {
-        replies.push({ text: R.q2Retry, chips: TIME_CHIPS });
+        replies.push({ text: parseOrderText(cleanOrderText(text)).items.length && /[a-z]{3,}/i.test(text) ? R.q2LooksLikeFood(describeItems(next.items)) : R.q2Retry, chips: TIME_CHIPS });
         break;
       }
       next.pickupTime = t;
@@ -679,7 +707,7 @@ export const BANNED_PHRASES: RegExp[] = [
 ];
 
 export function allReplyTemplates(): string[] {
-  return [...Object.values(R), ...FAQ.map((f) => f.answer)];
+  return [...Object.values(R).map((v) => (typeof v === "function" ? v("2× Tacos") : v)), ...FAQ.map((f) => f.answer)];
 }
 
 export function runChatChecks(): ChatCheck[] {
@@ -837,6 +865,25 @@ export function runChatChecks(): ChatCheck[] {
     expected: "👍 2 · 👎 1 · rating 9 → none · rating 4 → 4",
     actual: `👍 ${row.thumbs_up} · 👎 ${row.thumbs_down} · rating 9 → ${row.rating ?? "none"} · rating 4 → ${row4.rating}`,
     pass: row.thumbs_up === 2 && row.thumbs_down === 1 && row.rating === null && row4.rating === 4,
+  });
+
+  // 15. Week 5 fix: leftover words after a removed card number aren't read as food
+  const leftover = runConversation(["I'm allergic to peanuts and my card is 4242 4242 4242 4242"]).state;
+  checks.push({
+    name: "15. Words left after a removed card number aren't read as food",
+    expected: "0 items · still on question 1",
+    actual: `${leftover.items.length} items${leftover.items.length ? ` (${describeItems(leftover.items)})` : ""} · ${leftover.step}`,
+    pass: leftover.items.length === 0 && leftover.step === "q1_order",
+  });
+
+  // 16. Week 5 fix: "2 tacos" at the time question isn't read as 2:00 PM
+  const notTime = runConversation(["a burrito bowl", "2 tacos"]).state;
+  const realTimes = ["1pm", "12:30", "at 2", "around 1 pm", "noon"].map(parseTimeAnswer);
+  checks.push({
+    name: "16. \"2 tacos\" at the time question isn't read as 2:00 PM",
+    expected: "time not set · real times still work (5 of 5)",
+    actual: `time ${notTime.pickupTime ?? "not set"} · real times ${realTimes.filter(Boolean).length} of 5`,
+    pass: notTime.pickupTime === null && notTime.step === "q2_time" && realTimes.every(Boolean),
   });
 
   return checks;

@@ -81,6 +81,8 @@ export default function SessionFeedback({ state, messages, onSave }: Props) {
         <label className="text-sm">
           <span className="text-black/70 dark:text-white/60">Tester label (optional)</span>
           <input
+            id="tester-label"
+            name="tester_label"
             value={testerLabel}
             onChange={(e) => setTesterLabel(e.target.value)}
             maxLength={40}
@@ -91,6 +93,8 @@ export default function SessionFeedback({ state, messages, onSave }: Props) {
         <label className="text-sm">
           <span className="text-black/70 dark:text-white/60">Comment (optional)</span>
           <input
+            id="session-comment"
+            name="comment"
             value={comment}
             onChange={(e) => {
               setComment(e.target.value);

@@ -81,6 +81,7 @@ export default function ChatWindow({ messages, onSend, onThumb, onRestart, showP
           </label>
           <input
             id="chat-input"
+            name="message"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             maxLength={MAX_MESSAGE_LENGTH + 100}
