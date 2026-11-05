@@ -128,11 +128,11 @@ export default function DocsPage() {
         <ul className="mt-1 list-inside list-disc text-sm text-black/70 dark:text-white/60">
           <li>Spanish-first in Week 4; switched to English by default in Week 5 after instructor feedback (Spanish stays an optional toggle).</li>
           <li>No invented numbers or testimonials; real quotes are paraphrased, dated and anonymous.</li>
-          <li>No launch claims (&quot;pide ya&quot;, &quot;ya disponible&quot;) while ordering isn&apos;t live — logic check 11 enforces this.</li>
+          <li>No launch claims (&quot;order now&quot;, &quot;available now&quot;) while ordering isn&apos;t live — logic check 11 enforces this.</li>
           <li>
             The <code>/core</code> demo only understands English orders, so
-            every demo example in the copy is English and says so — logic
-            check 12 runs that exact example through the real parser.
+            every demo example in the copy is English — logic check 12 runs
+            that exact example through the real parser.
           </li>
           <li>Never imply IBEROGO is official Universidad Iberoamericana.</li>
         </ul>
@@ -143,6 +143,52 @@ export default function DocsPage() {
           per test), and votes are saved to Supabase (<code>ab_votes</code>).
           The Test 1 winner becomes the homepage headline by changing{" "}
           <code>HOMEPAGE_HEADLINE</code> in <code>lib/marketing.ts</code>.
+          The tests were run in Spanish; since Week 5 the homepage shows the
+          English translation of the winner.
+        </p>
+      </section>
+
+      <section className="mt-6 rounded-lg border border-black/10 p-5 dark:border-white/10">
+        <h2 className="text-lg font-semibold">Prompt library — Week 5: Guided assistant (/chat)</h2>
+        <p className="mt-2 text-sm text-black/70 dark:text-white/60">
+          The <code>/chat</code> assistant is a <strong>simulated, rule-based state machine</strong>{" "}
+          (<code>lib/chat.ts</code>), not an AI API call. The page says so at the top. Free tools only.
+        </p>
+
+        <h3 className="mt-4 text-sm font-semibold">Order of checks for every message</h3>
+        <ol className="mt-1 list-inside list-decimal text-sm text-black/70 dark:text-white/60">
+          <li>
+            <strong>Guardrails</strong>: too long, payment data, personal data, allergy, abusive language, &quot;is my order
+            real?&quot;, &quot;talk to a human&quot;, off-topic.
+          </li>
+          <li>
+            <strong>Intake</strong>: what (parsed by the Week 1 parser) → when (skipped with a confirmation if the order
+            already had a time) → where → summary.
+          </li>
+          <li>
+            <strong>FAQ</strong>: questions are answered from the same data the homepage and <code>/pricing</code> use, so they
+            can&apos;t contradict each other.
+          </li>
+          <li>
+            <strong>Fallback</strong>: &quot;I&apos;m not sure&quot;; two in a row flags the chat for a person.
+          </li>
+        </ol>
+
+        <h3 className="mt-4 text-sm font-semibold">Human checkpoint</h3>
+        <ul className="mt-1 list-inside list-disc text-sm text-black/70 dark:text-white/60">
+          <li>Nothing counts as an order request until the student presses <strong>Confirm</strong> on the summary.</li>
+          <li>
+            Allergies, complaints, &quot;talk to a human&quot; and repeated unknowns set the outcome to{" "}
+            <strong>handoff</strong>. Those sessions appear under &quot;Needs human review&quot;. The assistant never
+            promises allergen safety.
+          </li>
+        </ul>
+
+        <h3 className="mt-4 text-sm font-semibold">Storage and privacy</h3>
+        <p className="mt-1 text-sm text-black/70 dark:text-white/60">
+          &quot;Save test summary&quot; writes one row to <code>chat_sessions</code> (outcome, redacted transcript, guardrails,
+          👍/👎 counts, 1–5 rating, comment). Card numbers, emails and phone numbers are replaced with placeholders in
+          the browser before anything is saved or shown.
         </p>
       </section>
     </div>

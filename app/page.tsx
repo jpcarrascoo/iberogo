@@ -3,6 +3,7 @@ import SupabaseStatus from "@/components/SupabaseStatus";
 import ResearchWidget from "@/components/ResearchWidget";
 import PricingWidget from "@/components/PricingWidget";
 import MarketingWidget from "@/components/MarketingWidget";
+import ChatWidget from "@/components/ChatWidget";
 import LandingHome from "@/components/LandingHome";
 
 export default function Home() {
@@ -25,6 +26,7 @@ export default function Home() {
           <ResearchWidget />
           <PricingWidget />
           <MarketingWidget />
+          <ChatWidget />
         </div>
       </section>
 
