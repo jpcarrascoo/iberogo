@@ -1,8 +1,8 @@
 // IBEROGO — Week 3 product architecture.
 // Honest status: only features that actually run on the live site are marked "Built".
 
-export type Tier = "Básico" | "Plus" | "Campus Pass" | "Vendor";
-export const TIER_COLUMNS: Tier[] = ["Básico", "Plus", "Campus Pass", "Vendor"];
+export type Tier = "Basic" | "Plus" | "Campus Pass" | "Vendor";
+export const TIER_COLUMNS: Tier[] = ["Basic", "Plus", "Campus Pass", "Vendor"];
 
 export type Feature = {
   name: string;
@@ -19,7 +19,7 @@ export const FEATURES: Feature[] = [
     description: "Type an order like a text message; get items, quantities, notes and pickup time.",
     status: "Built",
     week: "Week 1",
-    tiers: ["Básico", "Plus", "Campus Pass"],
+    tiers: ["Basic", "Plus", "Campus Pass"],
     link: "/core",
   },
   {
@@ -27,7 +27,7 @@ export const FEATURES: Feature[] = [
     description: "Students pick where and when to collect, instead of classroom delivery or waiting in line.",
     status: "Built",
     week: "Week 1",
-    tiers: ["Básico", "Plus", "Campus Pass"],
+    tiers: ["Basic", "Plus", "Campus Pass"],
     link: "/core",
   },
   {

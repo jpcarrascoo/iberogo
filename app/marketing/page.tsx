@@ -51,6 +51,7 @@ function Section({ id, title, zone, children }: { id: string; title: string; zon
 export default function MarketingPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [start, setStart] = useState(DEFAULT_START_DATE);
+  const [showEs, setShowEs] = useState(false);
   const bump = () => setRefreshKey((k) => k + 1);
 
   return (
@@ -72,6 +73,10 @@ export default function MarketingPage() {
           <button type="button" className={BTN_PRIMARY} onClick={() => downloadText("iberogo-marketing-kit.md", toMarkdown(start), "text/markdown")}>
             Export kit (.md)
           </button>
+          <label className="flex items-center gap-2 text-sm text-black/70 dark:text-white/60">
+            <input type="checkbox" checked={showEs} onChange={(e) => setShowEs(e.target.checked)} />
+            Show optional Spanish versions
+          </label>
           <nav aria-label="On this page" className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
             {SECTIONS.map((s) => (
               <a key={s.id} href={`#${s.id}`} className="text-black/60 hover:text-red-700 dark:text-white/50 dark:hover:text-red-400">
@@ -92,15 +97,15 @@ export default function MarketingPage() {
         </Section>
 
         <Section id="landing" title="Landing page copy" zone="Output">
-          <LandingCopy onSaved={bump} />
+          <LandingCopy onSaved={bump} showEs={showEs} />
         </Section>
 
         <Section id="posts" title={`Social posts (${POSTS.length})`} zone="Output">
-          <PostCards onSaved={bump} />
+          <PostCards onSaved={bump} showEs={showEs} />
         </Section>
 
         <Section id="scripts" title={`Video scripts (${SCRIPTS.length})`} zone="Output">
-          <ScriptCards onSaved={bump} />
+          <ScriptCards onSaved={bump} showEs={showEs} />
         </Section>
 
         <Section id="calendar" title="14-day campaign calendar" zone="Input">
@@ -108,7 +113,7 @@ export default function MarketingPage() {
         </Section>
 
         <Section id="ab" title="A/B headline test" zone="Input">
-          <ABTester />
+          <ABTester showEs={showEs} />
         </Section>
 
         <Section id="saved" title="Saved marketing assets" zone="Saved">

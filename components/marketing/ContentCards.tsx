@@ -6,7 +6,7 @@ import { CopyButton, SaveButton } from "./actions";
 
 const CHANNELS: ("All" | Channel)[] = ["All", "Instagram", "Instagram Story", "X", "WhatsApp", "LinkedIn"];
 
-export function PostCards({ onSaved }: { onSaved: () => void }) {
+export function PostCards({ onSaved, showEs }: { onSaved: () => void; showEs: boolean }) {
   const [channel, setChannel] = useState<"All" | Channel>("All");
   const shown = channel === "All" ? POSTS : POSTS.filter((p) => p.channel === channel);
 
@@ -46,9 +46,11 @@ export function PostCards({ onSaved }: { onSaved: () => void }) {
               </div>
               <p className="mt-1 text-xs text-black/50 dark:text-white/40">{p.format}</p>
               <pre className="mt-3 flex-1 whitespace-pre-wrap font-sans text-sm text-black/85 dark:text-white/80">{text}</pre>
-              <p className="mt-3 border-t border-black/10 pt-2 text-xs text-black/55 dark:border-white/10 dark:text-white/45">
-                <span className="font-semibold">EN:</span> {p.en}
-              </p>
+              {showEs && (
+                <p lang="es" className="mt-3 whitespace-pre-wrap border-t border-black/10 pt-2 text-xs text-black/55 dark:border-white/10 dark:text-white/45">
+                  <span className="font-semibold">Spanish (optional):</span> {p.es}
+                </p>
+              )}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <CopyButton text={text} />
                 <SaveButton kind="post" assetId={p.id} title={`${p.id} · ${p.channel} — ${p.format}`} channel={p.channel} body={text} onSaved={onSaved} />
@@ -65,7 +67,7 @@ export function PostCards({ onSaved }: { onSaved: () => void }) {
   );
 }
 
-export function ScriptCards({ onSaved }: { onSaved: () => void }) {
+export function ScriptCards({ onSaved, showEs }: { onSaved: () => void; showEs: boolean }) {
   return (
     <ul className="space-y-4">
       {SCRIPTS.map((s) => {
@@ -87,7 +89,7 @@ export function ScriptCards({ onSaved }: { onSaved: () => void }) {
                     <th scope="col" className="w-16 py-1 pr-3 font-medium">Time</th>
                     <th scope="col" className="py-1 pr-3 font-medium">Visual</th>
                     <th scope="col" className="py-1 pr-3 font-medium">On screen</th>
-                    <th scope="col" className="py-1 font-medium">Voice-over (ES) / EN</th>
+                    <th scope="col" className="py-1 font-medium">Voice-over</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black/10 align-top dark:divide-white/10">
@@ -95,10 +97,17 @@ export function ScriptCards({ onSaved }: { onSaved: () => void }) {
                     <tr key={sc.t}>
                       <td className="py-2 pr-3 tabular-nums text-black/60 dark:text-white/50">{sc.t}</td>
                       <td className="py-2 pr-3">{sc.visual}</td>
-                      <td className="py-2 pr-3 font-medium">{sc.onScreen || "—"}</td>
+                      <td className="py-2 pr-3 font-medium">
+                        {sc.onScreen || "—"}
+                        {showEs && sc.es.onScreen && (
+                          <span lang="es" className="block text-xs font-normal text-black/50 dark:text-white/40">ES: {sc.es.onScreen}</span>
+                        )}
+                      </td>
                       <td className="py-2">
                         {sc.vo}
-                        <span className="block text-xs text-black/50 dark:text-white/40">{sc.en}</span>
+                        {showEs && sc.es.vo !== "—" && (
+                          <span lang="es" className="block text-xs text-black/50 dark:text-white/40">ES: {sc.es.vo}</span>
+                        )}
                       </td>
                     </tr>
                   ))}

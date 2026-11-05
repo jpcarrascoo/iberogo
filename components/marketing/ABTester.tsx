@@ -5,7 +5,7 @@ import { AB_TESTS, MIN_VOTES, abSummary, type ABTest, type Choice } from "@/lib/
 import { fetchVotes, recordVote, type Vote } from "@/lib/supabaseMarketing";
 import { BTN_PRIMARY } from "./actions";
 
-function TestCard({ test, votes, onVoted }: { test: ABTest; votes: Vote[]; onVoted: () => void }) {
+function TestCard({ test, votes, onVoted, showEs }: { test: ABTest; votes: Vote[]; onVoted: () => void; showEs: boolean }) {
   const [picked, setPicked] = useState<Choice | null>(null);
   const [reason, setReason] = useState("");
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -45,7 +45,11 @@ function TestCard({ test, votes, onVoted }: { test: ABTest; votes: Vote[]; onVot
         <h3 className="font-semibold">{test.name}</h3>
         <p className="text-xs text-black/50 dark:text-white/40">Used in: {test.where}</p>
       </div>
-      <p className="mt-1 text-sm text-black/60 dark:text-white/50">Ask: {test.question}</p>
+      <p className="mt-1 text-sm text-black/60 dark:text-white/50">
+        Ask: {test.question}
+        {showEs && <span lang="es"> (asked in Spanish: “{test.questionEs}”)</span>}
+      </p>
+      <p className="mt-1 text-xs text-black/45 dark:text-white/35">These tests were run in person in Spanish; tick “Show optional Spanish versions” to see the exact wording.</p>
 
       <fieldset className="mt-3">
         <legend className="sr-only">Which variant did the student pick?</legend>
@@ -59,8 +63,10 @@ function TestCard({ test, votes, onVoted }: { test: ABTest; votes: Vote[]; onVot
             >
               <input type="radio" name={test.id} value={c} checked={picked === c} onChange={() => setPicked(c)} className="sr-only" />
               <span className="text-xs font-semibold text-black/50 dark:text-white/40">Variant {c}</span>
-              <span className="mt-1 block text-lg font-bold leading-snug">{test.variants[c].es}</span>
-              <span className="block text-sm text-black/55 dark:text-white/45">{test.variants[c].en}</span>
+              <span className="mt-1 block text-lg font-bold leading-snug">{test.variants[c].en}</span>
+              {showEs && (
+                <span lang="es" className="block text-sm text-black/55 dark:text-white/45">Shown to students: “{test.variants[c].es}”</span>
+              )}
             </label>
           ))}
         </div>
@@ -111,7 +117,7 @@ function TestCard({ test, votes, onVoted }: { test: ABTest; votes: Vote[]; onVot
   );
 }
 
-export default function ABTester() {
+export default function ABTester({ showEs }: { showEs: boolean }) {
   const [votes, setVotes] = useState<Vote[]>([]);
   const [error, setError] = useState("");
 
@@ -142,7 +148,7 @@ export default function ABTester() {
       {error && <p className="text-sm text-red-700 dark:text-red-400">{error}</p>}
       <div className="grid gap-4 lg:grid-cols-2">
         {AB_TESTS.map((t) => (
-          <TestCard key={t.id} test={t} votes={votes} onVoted={load} />
+          <TestCard key={t.id} test={t} votes={votes} onVoted={load} showEs={showEs} />
         ))}
       </div>
     </div>

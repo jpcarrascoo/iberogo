@@ -45,7 +45,7 @@ export function DraftForm({ onSaved }: { onSaved: () => void }) {
               setState("idle");
             }}
             maxLength={80}
-            placeholder="e.g. Story: ¿qué comiste hoy entre clases?"
+            placeholder="e.g. Story: what did you eat between classes today?"
             className="mt-1 w-full rounded-md border border-black/15 bg-transparent px-3 py-1.5 dark:border-white/20"
           />
         </label>

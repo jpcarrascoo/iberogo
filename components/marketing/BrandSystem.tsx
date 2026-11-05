@@ -8,9 +8,8 @@ export default function BrandSystem() {
           {BRAND.wordmark.first}
           <span className="text-red-600">{BRAND.wordmark.accent}</span>
         </p>
-        <p className="mt-2 font-medium">{BRAND.tagline.es}</p>
-        <p className="text-sm text-black/60 dark:text-white/50">{BRAND.tagline.en}</p>
-        <p className="mt-3 text-sm text-black/70 dark:text-white/60">{BRAND.oneLiner.es}</p>
+        <p className="mt-2 font-medium">{BRAND.tagline.en}</p>
+        <p className="mt-3 text-sm text-black/70 dark:text-white/60">{BRAND.oneLiner.en}</p>
       </div>
 
       <div>
@@ -79,7 +78,7 @@ export default function BrandSystem() {
             {VOICE.map((v) => (
               <li key={v.rule} className="rounded-lg border border-black/10 p-3 dark:border-white/10">
                 <p className="font-medium">
-                  {v.rule} <span className="font-normal text-black/50 dark:text-white/40">({v.en})</span>
+                  {v.rule}
                 </p>
                 <p className="mt-1 text-black/60 dark:text-white/50">{v.example}</p>
               </li>

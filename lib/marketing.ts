@@ -40,8 +40,8 @@ export const PERSONA = {
   ],
   channels: ["Instagram (stories)", "TikTok", "WhatsApp groups (carrera / generación)"],
   wouldPay: {
-    es: "Usaría Básico ($0) de inmediato; pagaría Plus ($59/mes) solo si la prioridad de verdad le da su comida más rápido.",
-    en: "Would use Básico ($0) right away; would pay Plus ($59/month) only if priority reliably gets her food faster.",
+    es: "Usaría Basic ($0) de inmediato; pagaría Plus ($59/mes) solo si la prioridad de verdad le da su comida más rápido.",
+    en: "Would use Basic ($0) right away; would pay Plus ($59/month) only if priority reliably gets her food faster.",
   },
   basedOn: [
     {
@@ -68,6 +68,7 @@ export type ABTest = {
   name: string;
   where: string;
   question: string;
+  questionEs: string; // the in-person tests were run in Spanish
   variants: Record<Choice, Bilingual>;
   hypothesis: string;
 };
@@ -77,7 +78,8 @@ export const AB_TESTS: ABTest[] = [
     id: "AB1",
     name: "Test 1 — Hero headline",
     where: "Homepage hero headline",
-    question: "¿Cuál te daría más ganas de probar la app? (Which one makes you want to try the app?)",
+    question: "Which one makes you want to try the app?",
+    questionEs: "¿Cuál te daría más ganas de probar la app?",
     variants: {
       A: { es: "Sáltate la fila en la IBERO.", en: "Skip the line at IBERO." },
       B: { es: "Tu comida, lista entre clases.", en: "Your food, ready between classes." },
@@ -88,7 +90,8 @@ export const AB_TESTS: ABTest[] = [
     id: "AB2",
     name: "Test 2 — Lead message",
     where: "Homepage subhead + first line of posts",
-    question: "¿Cuál de estas te convence más de usarla? (Which one convinces you more?)",
+    question: "Which one convinces you more to use it?",
+    questionEs: "¿Cuál de estas te convence más de usarla?",
     variants: {
       A: { es: "Pide como le escribes a un amigo.", en: "Order the way you'd text a friend." },
       B: { es: "Tú eliges a qué hora y dónde recoges.", en: "You choose when and where you pick up." },
@@ -99,6 +102,11 @@ export const AB_TESTS: ABTest[] = [
 
 // Change this to the Test 1 winner once the A/B test has at least MIN_VOTES real votes.
 export const HOMEPAGE_HEADLINE: Choice = "A";
+
+// Week 5 (English default): the test was run in person with the Spanish wording.
+// The English headline is its direct translation, not a separately tested result.
+export const HEADLINE_NOTE =
+  "Test 1 was run in person in Spanish. The English headline is a direct translation of the winning variant, not a separately tested result.";
 
 export const MIN_VOTES = 5;
 
@@ -138,7 +146,7 @@ export const LANDING = {
   secondaryCta: { label: { es: "Ver precios", en: "See pricing" }, href: "/pricing" },
   notice: {
     es: "IBEROGO es un prototipo: el demo convierte tu mensaje (en inglés, por ahora) en un pedido, pero todavía no se envía a ninguna cafetería ni se cobra nada.",
-    en: "IBEROGO is a prototype: the demo turns your message (in English, for now) into an order, but it isn't sent to any cafeteria and nothing is charged yet.",
+    en: "IBEROGO is a prototype: the demo turns your message into an order, but it isn't sent to any cafeteria and nothing is charged yet.",
   },
   stepsTitle: { es: "Cómo funciona", en: "How it works" },
   steps: [
@@ -146,7 +154,7 @@ export const LANDING = {
       title: { es: "Escribe", en: "Type it" },
       body: {
         es: `Como un mensaje: “${DEMO_EXAMPLE}”. (Por ahora el demo entiende pedidos en inglés.)`,
-        en: `Just like a text: “${DEMO_EXAMPLE}”. (For now the demo understands English orders.)`,
+        en: `Just like a text: “${DEMO_EXAMPLE}”.`,
       },
     },
     {
@@ -173,8 +181,8 @@ export const LANDING = {
     {
       q: { es: "…pagar extra para que te atiendan primero?", en: "…pay extra to be served first?" },
       a: {
-        es: "Pagar en cada pedido se siente injusto. Básico es gratis; la prioridad sería un plan opcional.",
-        en: "Paying on every order feels unfair. Básico is free; priority would be an optional plan.",
+        es: "Pagar en cada pedido se siente injusto. Basic es gratis; la prioridad sería un plan opcional.",
+        en: "Paying on every order feels unfair. Basic is free; priority would be an optional plan.",
       },
     },
     {
@@ -208,14 +216,14 @@ export const LANDING = {
       q: { es: "¿Ya puedo pedir y pagar?", en: "Can I order and pay yet?" },
       a: {
         es: "Todavía no. Hoy puedes probar el demo que convierte tu mensaje en un pedido (por ahora entiende inglés). Cafeterías y pagos vienen después.",
-        en: "Not yet. Today you can try the demo that turns your message into an order (English only for now). Cafeterias and payments come later.",
+        en: "Not yet. Today you can try the demo that turns your message into an order. Cafeterias and payments come later.",
       },
     },
     {
       q: { es: "¿Cuánto cuesta?", en: "How much does it cost?" },
       a: {
-        es: "Básico será gratis. Plus ($59/mes) y Campus Pass ($129/mes) son propuestas que seguimos validando con estudiantes.",
-        en: "Básico will be free. Plus ($59/month) and Campus Pass ($129/month) are proposals we're still validating with students.",
+        es: "Basic será gratis. Plus ($59/mes) y Campus Pass ($129/mes) son propuestas que seguimos validando con estudiantes.",
+        en: "Basic will be free. Plus ($59/month) and Campus Pass ($129/month) are proposals we're still validating with students.",
       },
     },
   ],
@@ -224,15 +232,15 @@ export const LANDING = {
 // --- Social posts ---------------------------------------------------------------
 
 export type Channel = "Instagram" | "Instagram Story" | "X" | "WhatsApp" | "LinkedIn";
-export type Pillar = "Problema" | "Cómo funciona" | "Precio" | "Confianza" | "Comunidad";
+export type Pillar = "Problem" | "How it works" | "Pricing" | "Trust" | "Community";
 
 export type Post = {
   id: string;
   channel: Channel;
   format: string;
   pillar: Pillar;
-  es: string;
-  en: string;
+  en: string; // primary (English by default, per instructor feedback)
+  es: string; // optional Spanish version
   hashtags: string[];
 };
 
@@ -251,123 +259,165 @@ export const POSTS: Post[] = [
     id: "P1",
     channel: "Instagram",
     format: "Feed post (single image: the cafeteria line)",
-    pillar: "Problema",
+    pillar: "Problem",
+    en: `How many minutes of your break go to the cafeteria line? 🕐
+
+We're building IBEROGO: order ahead, choose when and where you pick up, and walk straight to your food.
+
+It's a student project and still a prototype. Try the demo (link in bio) and tell us what's missing.`,
     es: `¿Cuántos minutos de tu break se te van en la fila de la cafetería? 🕐
 
 Estamos construyendo IBEROGO: pides antes, eliges a qué hora y dónde recoges, y llegas directo por tu comida.
 
 Es un proyecto estudiantil y todavía es prototipo. Prueba el demo (link en bio) y dinos qué le falta.`,
-    en: "How much of your break goes to the cafeteria line? We're building IBEROGO — order ahead, pick your time and place. Student project, still a prototype: try the demo and tell us what's missing.",
-    hashtags: ["#IBERO", "#IBEROGO", "#VidaUniversitaria", "#CDMX"],
+    hashtags: ["#IBERO", "#IBEROGO", "#CampusLife", "#MexicoCity"],
   },
   {
     id: "P2",
     channel: "Instagram Story",
     format: "Story with poll sticker",
-    pillar: "Comunidad",
+    pillar: "Community",
+    en: `Quick question 👀
+What would make you use a food ordering app on campus?
+
+[Poll]
+📝 Order the way I'd text a friend
+📍 Choose when and where I pick up`,
     es: `Pregunta rápida 👀
 ¿Qué te haría usar una app para pedir comida en la uni?
 
 [Encuesta]
 📝 Pedir como le escribo a un amigo
 📍 Elegir a qué hora y dónde recojo`,
-    en: "Quick question: what would make you use a campus food app? Poll: order like texting a friend vs. choose pickup time and place. (An informal online signal alongside A/B Test 2.)",
     hashtags: [],
   },
   {
     id: "P3",
     channel: "X",
     format: "Single post",
-    pillar: "Cómo funciona",
+    pillar: "How it works",
+    en: `You type: “${DEMO_EXAMPLE}”.
+IBEROGO turns it into an order: what, how many, notes and pickup time.
+Try it 👉 ${DEMO}/core`,
     es: `Escribes: “${DEMO_EXAMPLE}”.
 IBEROGO lo convierte en un pedido: qué, cuántos, notas y hora.
-El demo por ahora entiende inglés. Pruébalo 👉 ${DEMO}/core`,
-    en: `You type “${DEMO_EXAMPLE}” — IBEROGO turns it into an order: items, quantities, notes and time. The demo understands English for now. Try it.`,
+Pruébalo 👉 ${DEMO}/core`,
     hashtags: ["#IBERO"],
   },
   {
     id: "P4",
     channel: "WhatsApp",
     format: "Message for class / generation group chats",
-    pillar: "Comunidad",
+    pillar: "Community",
+    en: `Hi! I'm Jose, an IBERO student 👋
+I'm building IBEROGO, an app to order food ahead and pick it up between classes without waiting in line.
+It's still a demo (try an order like “${DEMO_EXAMPLE}”, or use the guided chat). Could you test it for 2 minutes and tell me what you'd change? 🙏
+${DEMO}/chat`,
     es: `¡Hola! Soy Jose, estudiante de la IBERO 👋
 Estoy armando IBEROGO, una app para pedir comida antes y recogerla entre clases sin hacer fila.
-Todavía es un demo (por ahora entiende pedidos en inglés, tipo “${DEMO_EXAMPLE}”): ¿me ayudan probándolo 2 minutos y diciéndome qué le cambiarían? 🙏
-${DEMO}`,
-    en: "Hi! I'm Jose, an IBERO student. I'm building IBEROGO, an app to order food ahead and pick it up between classes without queuing. It's still a demo (English orders only for now) — could you try it for 2 minutes and tell me what you'd change?",
+Todavía es un demo (prueba un pedido tipo “${DEMO_EXAMPLE}”, o usa el chat guiado): ¿me ayudan probándolo 2 minutos y diciéndome qué le cambiarían? 🙏
+${DEMO}/chat`,
     hashtags: [],
   },
   {
     id: "P5",
     channel: "Instagram",
     format: "Carousel (4 slides)",
-    pillar: "Cómo funciona",
+    pillar: "How it works",
+    en: `This is how IBEROGO works 👇
+
+1/ Type your order like a text.
+2/ Choose when and where you pick it up.
+3/ Walk up, grab it, go to class.
+4/ It's still a demo: try it and tell us what's missing. Link in bio.`,
     es: `Así funciona IBEROGO 👇
 
 1/ Escribe tu pedido como un mensaje.
 2/ Elige a qué hora y en qué punto lo recoges.
 3/ Llegas, recoges y a clase.
 4/ Todavía es un demo: pruébalo y dinos qué falta. Link en bio.`,
-    en: "How IBEROGO works: 1) type your order like a message, 2) choose time and pickup point, 3) collect and go to class, 4) it's still a demo — try it and tell us what's missing.",
-    hashtags: ["#IBEROGO", "#IBERO", "#Emprendimiento"],
+    hashtags: ["#IBEROGO", "#IBERO", "#StudentStartup"],
   },
   {
     id: "P6",
     channel: "Instagram",
     format: "Feed post (text graphic)",
-    pillar: "Problema",
+    pillar: "Problem",
+    en: `What you've already tried to eat between classes:
+🏃 Getting to campus 20 minutes early
+📚 Leaving class early
+🍽️ Just not eating
+
+With IBEROGO you choose the pickup time and place. No delivery to the classroom and no extra priority fee on every order.`,
     es: `Lo que ya intentaste para comer entre clases:
 🏃 Llegar 20 minutos antes
 📚 Salirte antes de clase
 🍽️ Simplemente no comer
 
 Con IBEROGO tú eliges la hora y el punto de recogida. Sin repartidor en el salón y sin cargo extra por prioridad en cada pedido.`,
-    en: "What you've already tried to eat between classes: arriving early, leaving class early, skipping the meal. With IBEROGO you pick the time and pickup point — no classroom delivery, no per-order priority fee.",
-    hashtags: ["#IBERO", "#VidaUniversitaria"],
+    hashtags: ["#IBERO", "#CampusLife"],
   },
   {
     id: "P7",
     channel: "Instagram",
     format: "Feed post (3 tier cards)",
-    pillar: "Precio",
+    pillar: "Pricing",
+    en: `What would IBEROGO cost? 💸
+
+Basic: $0. Order in plain text and choose your pickup time and place.
+Plus ($59/month) and Campus Pass ($129/month) are ideas for priority and schedule-based orders. They don't exist yet, and we want to know if you'd really pay for them.
+
+Would you? Tell us in the comments 👇`,
     es: `¿Cuánto costaría IBEROGO? 💸
 
-Básico: $0. Pides en texto libre y eliges hora y lugar.
+Basic: $0. Pides en texto libre y eliges hora y lugar.
 Plus ($59/mes) y Campus Pass ($129/mes) son ideas para prioridad y pedidos según tu horario. Todavía no existen y queremos saber si de verdad los pagarías.
 
 ¿Lo harías? Cuéntanos en comentarios 👇`,
-    en: "What would IBEROGO cost? Básico: free. Plus ($59/mo) and Campus Pass ($129/mo) are ideas for priority and schedule-based ordering — they don't exist yet and we want to know if you'd actually pay. Would you?",
     hashtags: ["#IBEROGO", "#IBERO"],
   },
   {
     id: "P8",
     channel: "Instagram",
     format: "Quote graphic",
-    pillar: "Confianza",
+    pillar: "Trust",
+    en: `“I've never used an app like this at IBERO, but I'd like to: it would save me time between classes and avoid long lines.”
+
+— IBERO student (real conversation, Sept 14, 2026, paraphrased)
+
+That's why we're building IBEROGO.`,
     es: `“Nunca he usado una app así en la IBERO, pero me gustaría: me ahorraría tiempo entre clases y evitaría las filas largas.”
 
 — Estudiante de la IBERO (conversación real, 14 sep 2026, parafraseado)
 
 Por eso estamos construyendo IBEROGO.`,
-    en: "Real (paraphrased) quote from an IBERO student conversation on Sept 14, 2026: never used an app like this at IBERO but would like to — it would save time and avoid long lines. That's why we're building IBEROGO.",
     hashtags: ["#IBEROGO", "#IBERO"],
   },
   {
     id: "P9",
     channel: "X",
     format: "Single post",
-    pillar: "Confianza",
+    pillar: "Trust",
+    en: `Is IBEROGO official IBERO?
+No. It's a student project, built by a student, still a prototype.
+That's why we ask for your feedback first 🙌 ${DEMO}`,
     es: `¿IBEROGO es oficial de la IBERO?
 No. Es un proyecto estudiantil, hecho por un alumno, en fase de prototipo.
 Por eso te pedimos feedback antes que nada 🙌 ${DEMO}`,
-    en: "Is IBEROGO official IBERO? No — it's a student project built by a student, still a prototype. That's why we ask for your feedback first.",
     hashtags: [],
   },
   {
     id: "P10",
     channel: "LinkedIn",
     format: "Build-in-public post",
-    pillar: "Comunidad",
+    pillar: "Community",
+    en: `Week 4 of building IBEROGO, an app that lets IBERO students order food ahead and pick it up between classes.
+
+The biggest lesson from talking to students: they don't care about the technology. They care about two simple things. Ordering the way they'd text a friend, and choosing when and where they pick up.
+
+This week I built the brand system, 10 posts, 3 video scripts and an A/B test with real students to decide which of those two ideas should lead.
+
+It's still a prototype. If you have feedback, I'd love to read it.`,
     es: `Semana 4 construyendo IBEROGO, una app para que los estudiantes de la IBERO pidan comida antes y la recojan entre clases.
 
 Lo que más aprendí hablando con estudiantes: no les importa la tecnología, les importan dos cosas simples. Pedir como le escriben a un amigo, y elegir a qué hora y dónde recogen.
@@ -375,18 +425,20 @@ Lo que más aprendí hablando con estudiantes: no les importa la tecnología, le
 Esta semana armé el sistema de marca, 10 posts, 3 guiones de video y un A/B test con estudiantes reales para decidir cuál de esas dos ideas va primero.
 
 Todavía es prototipo. Si tienes feedback, me encantaría leerlo.`,
-    en: "Week 4 building IBEROGO. What talking to students taught me: they care about two simple things — ordering like texting a friend, and choosing pickup time and place. This week: brand system, 10 posts, 3 video scripts and an A/B test with real students to decide which idea leads.",
-    hashtags: ["#BuildInPublic", "#Emprendimiento", "#IBERO"],
+    hashtags: ["#BuildInPublic", "#Entrepreneurship", "#IBERO"],
   },
 ];
 
 // --- Video scripts --------------------------------------------------------------
 
-export type Scene = { t: string; visual: string; onScreen: string; vo: string; en: string };
+// English is the primary script; `es` is the optional Spanish version of the
+// on-screen text and voice-over.
+export type Scene = { t: string; visual: string; onScreen: string; vo: string; es: { onScreen: string; vo: string } };
 
 export type Script = {
   id: string;
   title: string;
+  titleEs: string;
   platform: string;
   length: string;
   pillar: Pillar;
@@ -397,47 +449,50 @@ export type Script = {
 export const SCRIPTS: Script[] = [
   {
     id: "V1",
-    title: "La fila",
+    title: "The line",
+    titleEs: "La fila",
     platform: "TikTok",
     length: "30 s",
-    pillar: "Problema",
+    pillar: "Problem",
     scenes: [
-      { t: "0–3 s", visual: "Phone POV walking toward the cafeteria; the line comes into view.", onScreen: "POV: tu break es corto. La fila, no.", vo: "—", en: "POV: your break is short. The line isn't." },
-      { t: "3–10 s", visual: "Close-up of the phone clock, then back to the line.", onScreen: "", vo: "Llegas, ves la fila, haces cuentas… y no te da tiempo.", en: "You arrive, see the line, do the math… and there's no time." },
-      { t: "10–22 s", visual: `Screen recording of /core: typing “${DEMO_EXAMPLE}”, the structured card appears.`, onScreen: "Escríbelo como un mensaje (demo en inglés, por ahora)", vo: "Con IBEROGO escribes tu pedido como un mensaje y eliges a qué hora lo recoges.", en: "With IBEROGO you type your order like a message and choose when to pick it up." },
-      { t: "22–27 s", visual: "Jose to camera.", onScreen: DEMO, vo: "Todavía es un demo. Pruébalo y dime qué le falta.", en: "It's still a demo. Try it and tell me what's missing." },
-      { t: "27–30 s", visual: "IBEROGO wordmark on white.", onScreen: BRAND.tagline.es, vo: "—", en: BRAND.tagline.en },
+      { t: "0–3 s", visual: "Phone POV walking toward the cafeteria; the line comes into view.", onScreen: "POV: your break is short. The line isn't.", vo: "—", es: { onScreen: "POV: tu break es corto. La fila, no.", vo: "—" } },
+      { t: "3–10 s", visual: "Close-up of the phone clock, then back to the line.", onScreen: "", vo: "You get there, see the line, do the math… and there's no time.", es: { onScreen: "", vo: "Llegas, ves la fila, haces cuentas… y no te da tiempo." } },
+      { t: "10–22 s", visual: `Screen recording of /core: typing “${DEMO_EXAMPLE}”, the structured card appears.`, onScreen: "Type it like a text", vo: "With IBEROGO you type your order like a text and choose when to pick it up.", es: { onScreen: "Escríbelo como un mensaje", vo: "Con IBEROGO escribes tu pedido como un mensaje y eliges a qué hora lo recoges." } },
+      { t: "22–27 s", visual: "Jose to camera.", onScreen: DEMO, vo: "It's still a demo. Try it and tell me what's missing.", es: { onScreen: DEMO, vo: "Todavía es un demo. Pruébalo y dime qué le falta." } },
+      { t: "27–30 s", visual: "IBEROGO wordmark on white.", onScreen: BRAND.tagline.en, vo: "—", es: { onScreen: BRAND.tagline.es, vo: "—" } },
     ],
     productionNote: "Film on a phone, edit in CapCut (free). No identifiable faces or cafeteria staff without their permission.",
   },
   {
     id: "V2",
-    title: "Pide como le escribes a un amigo",
+    title: "Order the way you'd text a friend",
+    titleEs: "Pide como le escribes a un amigo",
     platform: "Instagram Reels",
     length: "30 s",
-    pillar: "Cómo funciona",
+    pillar: "How it works",
     scenes: [
-      { t: "0–4 s", visual: "Split screen: left a WhatsApp chat with a friend, right IBEROGO /core.", onScreen: "¿Cuál es la diferencia?", vo: "—", en: "What's the difference?" },
-      { t: "4–12 s", visual: `Left: “2 tacos sin cebolla y una coca, paso a la 1” sent to a friend. Right: “${DEMO_EXAMPLE}” typed into /core.`, onScreen: "Mismo pedido, como mensaje", vo: "Así le escribes a tu amigo para que te traiga algo…", en: "This is how you text a friend to bring you something…" },
-      { t: "12–22 s", visual: "Right side: the real parsed card — 2 × Tacos (no onions), 1 × Coke, pickup at 1 pm.", onScreen: "2 × tacos · no onions · 1:00 pm", vo: "…y así lo entiende IBEROGO. Sin formularios, sin menús eternos.", en: "…and this is how IBEROGO understands it. No forms, no endless menus." },
-      { t: "22–30 s", visual: "Wordmark + link.", onScreen: `El demo entiende inglés por ahora · ${DEMO}`, vo: "Es un prototipo y por ahora entiende inglés. ¿Lo quieres en español? Dímelo.", en: "It's a prototype and understands English for now. Want it in Spanish? Tell me." },
+      { t: "0–4 s", visual: "Split screen: left a WhatsApp chat with a friend, right IBEROGO /core.", onScreen: "What's the difference?", vo: "—", es: { onScreen: "¿Cuál es la diferencia?", vo: "—" } },
+      { t: "4–12 s", visual: `Left and right: the same message, “${DEMO_EXAMPLE}”, sent to a friend and typed into /core.`, onScreen: "Same order, as a text", vo: "This is how you'd text a friend to grab you something…", es: { onScreen: "Mismo pedido, como mensaje", vo: "Así le escribes a tu amigo para que te traiga algo…" } },
+      { t: "12–22 s", visual: "Right side: the real parsed card — 2 × Tacos (no onions), 1 × Coke, pickup at 1 pm.", onScreen: "2 × tacos · no onions · 1:00 pm", vo: "…and this is how IBEROGO understands it. No forms, no endless menus.", es: { onScreen: "2 × tacos · sin cebolla · 1:00 pm", vo: "…y así lo entiende IBEROGO. Sin formularios, sin menús eternos." } },
+      { t: "22–30 s", visual: "Wordmark + link.", onScreen: `Try the demo · ${DEMO}`, vo: "It's a prototype. Try it and tell me what you'd change.", es: { onScreen: `Prueba el demo · ${DEMO}`, vo: "Es un prototipo. Pruébalo y dime qué le cambiarías." } },
     ],
-    productionNote: "Pure screen recording — the easiest to make. Use the real /core demo with the English example, not a mockup.",
+    productionNote: "Pure screen recording — the easiest to make. Use the real /core demo with the example order, not a mockup.",
   },
   {
     id: "V3",
-    title: "Tú eliges hora y lugar",
+    title: "You choose when and where",
+    titleEs: "Tú eliges hora y lugar",
     platform: "TikTok",
     length: "45 s",
-    pillar: "Problema",
+    pillar: "Problem",
     scenes: [
-      { t: "0–5 s", visual: "Jose to camera, holding up three fingers.", onScreen: "3 “soluciones” para comer entre clases", vo: "Tres formas de comer entre clases… y por qué no funcionan.", en: "Three ways to eat between classes… and why they don't work." },
-      { t: "5–15 s", visual: "Text card 1.", onScreen: "1. Que te lo lleven al salón", vo: "Que te lo lleven al salón: es difícil de organizar e interrumpe la clase.", en: "Classroom delivery: hard to organize and it interrupts class." },
-      { t: "15–25 s", visual: "Text card 2.", onScreen: "2. Pagar extra por prioridad", vo: "Pagar extra para que te atiendan primero… en cada pedido. No.", en: "Paying extra to be served first… on every order. No." },
-      { t: "25–33 s", visual: "Text card 3.", onScreen: "3. Comer antes de llegar", vo: "Comer antes de llegar: con el tráfico, suerte.", en: "Eating before you arrive: with the traffic, good luck." },
-      { t: "33–45 s", visual: "Screen recording of the pickup time in /core, then Jose to camera.", onScreen: "Tú eliges a qué hora y dónde recoges", vo: "Con IBEROGO tú eliges a qué hora y en qué punto recoges. ¿Qué otra opción se te ocurre? Dímelo en comentarios.", en: "With IBEROGO you choose when and where you pick up. What other option can you think of? Tell me in the comments." },
+      { t: "0–5 s", visual: "Jose to camera, holding up three fingers.", onScreen: "3 “solutions” for eating between classes", vo: "Three ways to eat between classes… and why they don't work.", es: { onScreen: "3 “soluciones” para comer entre clases", vo: "Tres formas de comer entre clases… y por qué no funcionan." } },
+      { t: "5–15 s", visual: "Text card 1.", onScreen: "1. Delivery to the classroom", vo: "Classroom delivery: hard to organize, and it interrupts class.", es: { onScreen: "1. Que te lo lleven al salón", vo: "Que te lo lleven al salón: es difícil de organizar e interrumpe la clase." } },
+      { t: "15–25 s", visual: "Text card 2.", onScreen: "2. Paying extra for priority", vo: "Paying extra to be served first… on every order. No.", es: { onScreen: "2. Pagar extra por prioridad", vo: "Pagar extra para que te atiendan primero… en cada pedido. No." } },
+      { t: "25–33 s", visual: "Text card 3.", onScreen: "3. Eating before you arrive", vo: "Eating before you get to campus: with the traffic, good luck.", es: { onScreen: "3. Comer antes de llegar", vo: "Comer antes de llegar: con el tráfico, suerte." } },
+      { t: "33–45 s", visual: "Screen recording of the pickup time in /core, then Jose to camera.", onScreen: "You choose when and where you pick up", vo: "With IBEROGO you choose when and where you pick up. What other option can you think of? Tell me in the comments.", es: { onScreen: "Tú eliges a qué hora y dónde recoges", vo: "Con IBEROGO tú eliges a qué hora y en qué punto recoges. ¿Qué otra opción se te ocurre? Dímelo en comentarios." } },
     ],
-    productionNote: "Comments are the goal: reply to every one — that's free research for Week 5.",
+    productionNote: "Comments are the goal: reply to every one — that's free research for later weeks.",
   },
 ];
 
@@ -499,18 +554,20 @@ export function calendarWithDates(start: string): DatedDay[] {
 
 // --- Text builders (what Copy and Export put out) --------------------------------
 
-export function postText(p: Post): string {
-  return p.hashtags.length ? `${p.es}\n\n${p.hashtags.join(" ")}` : p.es;
+export function postText(p: Post, lang: Lang = "en"): string {
+  return p.hashtags.length ? `${p[lang]}\n\n${p.hashtags.join(" ")}` : p[lang];
 }
 
-export function scriptText(s: Script): string {
-  const lines = [`${s.title} — ${s.platform}, ${s.length}`, ""];
+export function scriptText(s: Script, lang: Lang = "en"): string {
+  const lines = [`${lang === "en" ? s.title : s.titleEs} — ${s.platform}, ${s.length}`, ""];
   for (const sc of s.scenes) {
+    const onScreen = lang === "en" ? sc.onScreen : sc.es.onScreen;
+    const vo = lang === "en" ? sc.vo : sc.es.vo;
     lines.push(`[${sc.t}] ${sc.visual}`);
-    if (sc.onScreen) lines.push(`  Texto en pantalla: ${sc.onScreen}`);
-    if (sc.vo && sc.vo !== "—") lines.push(`  Voz: ${sc.vo}`);
+    if (onScreen) lines.push(`  ${lang === "en" ? "On screen" : "Texto en pantalla"}: ${onScreen}`);
+    if (vo && vo !== "—") lines.push(`  ${lang === "en" ? "Voice-over" : "Voz"}: ${vo}`);
   }
-  lines.push("", `Nota: ${s.productionNote}`);
+  lines.push("", `Note: ${s.productionNote}`);
   return lines.join("\n");
 }
 
@@ -551,17 +608,16 @@ export function landingText(lang: Lang): string {
 
 export function toMarkdown(start: string): string {
   const out: string[] = [];
-  out.push(`# ${BRAND.name} — Marketing kit (Week 4)`, "");
-  out.push(`> ${BRAND.tagline.es} · ${BRAND.tagline.en}`, "");
+  out.push(`# ${BRAND.name} — Marketing kit (Week 4, English default since Week 5)`, "");
+  out.push(`> ${BRAND.tagline.en}`, "");
   out.push("Drafted with AI assistance from real research and two real student conversations; reviewed by a human before posting.", "");
   out.push("## Persona (composite)", "");
   out.push(`**${PERSONA.name}**, ${PERSONA.age}. ${PERSONA.context.en}`, "");
   out.push(`Would pay: ${PERSONA.wouldPay.en}`, "");
-  out.push("## Landing page copy (ES)", "", "```", landingText("es"), "```", "");
-  out.push("## Landing page copy (EN)", "", "```", landingText("en"), "```", "");
+  out.push("## Landing page copy", "", "```", landingText("en"), "```", "");
   out.push("## Social posts", "");
   for (const p of POSTS) {
-    out.push(`### ${p.id} · ${p.channel} — ${p.format} (${p.pillar})`, "", "```", postText(p), "```", "", `_EN:_ ${p.en}`, "");
+    out.push(`### ${p.id} · ${p.channel} — ${p.format} (${p.pillar})`, "", "```", postText(p), "```", "");
   }
   out.push("## Video scripts", "");
   for (const s of SCRIPTS) {
@@ -573,8 +629,19 @@ export function toMarkdown(start: string): string {
   }
   out.push("", "## A/B tests", "");
   for (const t of AB_TESTS) {
-    out.push(`### ${t.name}`, "", `- A: ${t.variants.A.es} (${t.variants.A.en})`, `- B: ${t.variants.B.es} (${t.variants.B.en})`, `- Hypothesis: ${t.hypothesis}`, "");
+    out.push(
+      `### ${t.name}`,
+      "",
+      `- A: ${t.variants.A.en} (shown to students in Spanish: “${t.variants.A.es}”)`,
+      `- B: ${t.variants.B.en} (shown to students in Spanish: “${t.variants.B.es}”)`,
+      `- Hypothesis: ${t.hypothesis}`,
+      ""
+    );
   }
+  out.push("## Appendix: optional Spanish versions", "");
+  out.push("### Landing page copy (ES)", "", "```", landingText("es"), "```", "");
+  for (const p of POSTS) out.push(`### ${p.id} (ES)`, "", "```", postText(p, "es"), "```", "");
+  for (const s of SCRIPTS) out.push(`### ${s.id} (ES)`, "", "```", scriptText(s, "es"), "```", "");
   return out.join("\n");
 }
 
@@ -582,7 +649,10 @@ export function toMarkdown(start: string): string {
 
 export type Check = { name: string; expected: string; actual: string; pass: boolean };
 
-const BANNED_CLAIMS = ["pide ya", "ya disponible", "descarga la app", "paga aquí", "miles de estudiantes", "envío gratis"];
+const BANNED_CLAIMS = [
+  "order now", "available now", "download the app", "pay here", "thousands of students", "free delivery",
+  "pide ya", "ya disponible", "descarga la app", "paga aquí", "miles de estudiantes", "envío gratis",
+];
 
 export function runMarketingChecks(): Check[] {
   const checks: Check[] = [];
@@ -670,11 +740,16 @@ export function runMarketingChecks(): Check[] {
     pass: dated[0].date === "Mon, Oct 26, 2026" && dated[13].date === "Sun, Nov 8, 2026",
   });
 
-  const allCopy = [...POSTS.map(postText), ...SCRIPTS.map(scriptText), landingText("es")].join("\n").toLowerCase();
+  const allCopy = [
+    ...POSTS.flatMap((p) => [postText(p), postText(p, "es")]),
+    ...SCRIPTS.flatMap((sc) => [scriptText(sc), scriptText(sc, "es")]),
+    landingText("en"),
+    landingText("es"),
+  ].join("\n").toLowerCase();
   const found = BANNED_CLAIMS.filter((b) => allCopy.includes(b));
   checks.push({
     name: "11. No launch claims while ordering isn't live",
-    expected: `none of: ${BANNED_CLAIMS.map((b) => `“${b}”`).join(", ")}`,
+    expected: `none of: ${BANNED_CLAIMS.slice(0, 6).map((b) => `“${b}”`).join(", ")} (or their Spanish equivalents)`,
     actual: found.length ? `Found: ${found.join(", ")}` : "none found",
     pass: found.length === 0,
   });

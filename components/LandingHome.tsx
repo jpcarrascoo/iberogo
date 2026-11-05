@@ -7,7 +7,7 @@ import { TIERS } from "@/lib/pricing";
 import { parseOrderText } from "@/lib/parseOrder";
 
 const TIER_SUMMARY_ES: Record<string, string> = {
-  "Básico": "Pide en texto libre y elige tu punto y hora de recogida.",
+  Basic: "Pide en texto libre y elige tu punto y hora de recogida.",
   Plus: "Prioridad sin pagar un cargo en cada pedido.",
   "Campus Pass": "Comida que se ajusta a tu horario de clases.",
 };
@@ -25,12 +25,12 @@ const T = {
 };
 
 export default function LandingHome() {
-  const [lang, setLang] = useState<Lang>("es");
+  const [lang, setLang] = useState<Lang>("en");
   const L = LANDING;
   const demo = useMemo(() => parseOrderText(DEMO_EXAMPLE), []);
 
   return (
-    <div>
+    <div lang={lang}>
       {/* Hero */}
       <section className="pb-12">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -38,7 +38,7 @@ export default function LandingHome() {
             {L.eyebrow[lang]}
           </span>
           <div role="group" aria-label="Language" className="inline-flex rounded-md border border-black/15 p-0.5 text-xs dark:border-white/20">
-            {(["es", "en"] as Lang[]).map((l) => (
+            {(["en", "es"] as Lang[]).map((l) => (
               <button
                 key={l}
                 type="button"

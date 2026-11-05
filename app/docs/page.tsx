@@ -126,7 +126,7 @@ export default function DocsPage() {
 
         <h3 className="mt-4 text-sm font-semibold">Rules the drafts must follow</h3>
         <ul className="mt-1 list-inside list-disc text-sm text-black/70 dark:text-white/60">
-          <li>Spanish for students, with an English line for the course.</li>
+          <li>Spanish-first in Week 4; switched to English by default in Week 5 after instructor feedback (Spanish stays an optional toggle).</li>
           <li>No invented numbers or testimonials; real quotes are paraphrased, dated and anonymous.</li>
           <li>No launch claims (&quot;pide ya&quot;, &quot;ya disponible&quot;) while ordering isn&apos;t live — logic check 11 enforces this.</li>
           <li>

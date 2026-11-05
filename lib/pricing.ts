@@ -46,7 +46,7 @@ export const PRESETS: Record<ScenarioKey, PricingInputs> = {
 
 export const TIERS = [
   {
-    name: "Básico",
+    name: "Basic",
     price: 0,
     summary: "Order in plain text and choose your own pickup point and time.",
     includes: ["Free-text ordering", "Choose pickup point + time", "Standard prep queue"],
@@ -55,7 +55,7 @@ export const TIERS = [
     name: "Plus",
     price: 59,
     summary: "Priority without paying a fee on every order.",
-    includes: ["Everything in Básico", "Priority preparation", "Reserved pickup slots at peak hours", "Member discounts"],
+    includes: ["Everything in Basic", "Priority preparation", "Reserved pickup slots at peak hours", "Member discounts"],
   },
   {
     name: "Campus Pass",
