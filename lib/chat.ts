@@ -408,10 +408,21 @@ export function cleanOrderText(text: string): string {
   return text
     .replace(/^(hi|hello|hey)[,!. ]+/i, "")
     .replace(/^(can|could|may) i (please )?(get|have|order)\s+/i, "")
-    .replace(/^(i'?d like|i would like|i want|i'?ll have|i'?ll take|give me|let me get|i need)( to order)?\s+/i, "")
+    // Week 5 fix (External Test, Tester 2): "id like to have a margherita pizza please…"
+    .replace(/^(i'?d like|i would like|i want|i wanna|i'?ll have|i'?ll take|give me|let me get|i need)( to (order|have|get|eat))?\s+/i, "")
+    .replace(/,?\s*\bplease\b,?/gi, " ")
     .replace(/[?!]+\s*$/, "")
-    .replace(/,?\s*please\.?\s*$/i, "")
+    .replace(/\s+/g, " ")
     .trim();
+}
+
+/** Week 5 fix (External Test, Tester 2): finds a known pickup point written inside the order ("…by the main cafeteria"). */
+export function extractPickupPoint(text: string): { rest: string; point: string | null } {
+  for (const p of PICKUP_POINTS) {
+    const re = new RegExp(`[,]?\\s*(?:pick(?:ing)? ?(?:it )?up\\s+)?(?:by|at|near|in|from|to)?\\s*(?:the\\s+)?${p.replace(/ /g, "\\s+")}\\b`, "i");
+    if (re.test(text)) return { rest: text.replace(re, " ").replace(/\s+/g, " ").trim(), point: p };
+  }
+  return { rest: text, point: null };
 }
 
 const SENSITIVE_CLAUSE_RE =
@@ -432,6 +443,18 @@ function splitAllergy(text: string): { rest: string; note: string | null } {
   const allergy = parts.filter((p) => ALLERGY_RE.test(p));
   const rest = parts.filter((p) => !ALLERGY_RE.test(p));
   return { rest: rest.join(", "), note: allergy.length ? allergy.join("; ") : null };
+}
+
+/** After the time is known: skip the pickup-point question if the order already named one. */
+function afterTime(next: ChatState, replies: Reply[]) {
+  if (next.pickupPoint) {
+    next.step = "summary";
+    replies.push({ text: `Pickup point: ${next.pickupPoint}.` });
+    replies.push({ text: R.summaryIntro, summary: currentSummary(next), chips: ["Confirm", "Edit"] });
+  } else {
+    next.step = "q3_point";
+    replies.push({ text: R.q3, chips: PICKUP_POINTS });
+  }
 }
 
 function unknownReply(next: ChatState, replies: Reply[], flags: GuardrailId[], shownText: string, again: string | null): RespondResult {
@@ -515,7 +538,8 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
         replies.push({ text: R.q1 });
         break;
       }
-      const parsed = parseOrderText(cleanOrderText(text));
+      const found = extractPickupPoint(cleanOrderText(text));
+      const parsed = parseOrderText(found.rest);
       if (parsed.items.length === 0) {
         next.orderRetries += 1;
         if (next.orderRetries >= 2) {
@@ -529,6 +553,7 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
       next.orderText = text;
       next.items = parsed.items;
       next.orderRetries = 0;
+      if (found.point) next.pickupPoint = found.point;
       if (parsed.pickupTimeIso) {
         next.pickupTime = timeFromIso(parsed.pickupTimeIso);
         next.step = "q2_confirm_time";
@@ -543,14 +568,13 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
     }
     case "q2_confirm_time": {
       if (YES_RE.test(text)) {
-        next.step = "q3_point";
-        replies.push({ text: R.q3, chips: PICKUP_POINTS });
+        afterTime(next, replies);
       } else {
         const t = parseTimeAnswer(text);
         if (t) {
           next.pickupTime = t;
-          next.step = "q3_point";
-          replies.push({ text: `Pickup at ${t}.` }, { text: R.q3, chips: PICKUP_POINTS });
+          replies.push({ text: `Pickup at ${t}.` });
+          afterTime(next, replies);
         } else if (NO_RE.test(text)) {
           next.step = "q2_time";
           replies.push({ text: R.q2, chips: TIME_CHIPS });
@@ -567,8 +591,8 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
         break;
       }
       next.pickupTime = t;
-      next.step = "q3_point";
-      replies.push({ text: `Pickup at ${t}.` }, { text: R.q3, chips: PICKUP_POINTS });
+      replies.push({ text: `Pickup at ${t}.` });
+      afterTime(next, replies);
       break;
     }
     case "q3_point": {
@@ -884,6 +908,15 @@ export function runChatChecks(): ChatCheck[] {
     expected: "time not set · real times still work (5 of 5)",
     actual: `time ${notTime.pickupTime ?? "not set"} · real times ${realTimes.filter(Boolean).length} of 5`,
     pass: notTime.pickupTime === null && notTime.step === "q2_time" && realTimes.every(Boolean),
+  });
+
+  // 17. Week 5 fix (External Test, Tester 2): a full one-sentence order is understood
+  const t2 = runConversation(["id like to have a margherita pizza please at 1:00pm by the main cafeteria", "Yes"]).state;
+  checks.push({
+    name: "17. Tester 2's one-sentence order is understood",
+    expected: "summary · 1× Margherita Pizza · 1:00 PM · Main cafeteria",
+    actual: `${t2.step} · ${describeItems(t2.items) || "no items"} · ${t2.pickupTime ?? "no time"} · ${t2.pickupPoint ?? "no point"}`,
+    pass: t2.step === "summary" && describeItems(t2.items) === "1× Margherita Pizza" && t2.pickupTime === "1:00 PM" && t2.pickupPoint === "Main cafeteria",
   });
 
   return checks;
