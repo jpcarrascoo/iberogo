@@ -10,8 +10,9 @@ const milestones: Milestone[] = [
   { week: "Week 2", title: "Research + Benchmarking: /research proves the problem is real, tracks competitors and risk", status: "done" },
   { week: "Week 3", title: "Product + Pricing: /product maps features to tiers, /pricing simulates revenue from students and vendors", status: "done" },
   { week: "Week 4", title: "Marketing Engine: /marketing brand system, persona, 10 posts, 3 scripts, 14-day calendar, A/B tests; homepage becomes a landing page", status: "done" },
-  { week: "Week 5", title: "Guided assistant: /chat order helper with intake, FAQ, guardrails, confirm step and hand-off; English becomes the default site-wide", status: "current" },
-  { week: "Week 6+", title: "Next course module — scope announced week by week", status: "planned" },
+  { week: "Week 5", title: "Guided assistant: /chat order helper with intake, FAQ, guardrails, confirm step and hand-off; English becomes the default site-wide", status: "done" },
+  { week: "Week 6", title: "Integrated venture: /demo guided walkthrough, /dashboard of every record, agent map, impact check, Version 2 roadmap, 5 new testers", status: "current" },
+  { week: "Version 2", title: "Vendor pilot, real menus, Spanish ordering, resolving hand-offs (see the V2 roadmap on /demo)", status: "planned" },
 ];
 
 const DOT_CLASS: Record<Milestone["status"], string> = {

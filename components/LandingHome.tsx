@@ -15,6 +15,7 @@ const TIER_SUMMARY_ES: Record<string, string> = {
 const T = {
   demoLabel: { es: "Así lo entiende el demo (resultado real)", en: "What the demo makes of it (real output)" },
   pickup: { es: "Recoger", en: "Pickup" },
+  demoCta: { es: "Prueba el demo de 5 minutos →", en: "Try the 5-minute demo →" },
   tiersTitle: { es: "Planes propuestos", en: "Proposed plans" },
   free: { es: "Gratis", en: "Free" },
   month: { es: "/mes", en: "/month" },
@@ -70,6 +71,9 @@ export default function LandingHome() {
                 {L.secondaryCta.label[lang]}
               </Link>
             </div>
+            <Link href="/demo" className="mt-4 inline-block font-semibold text-red-600 hover:underline" data-testid="hero-demo-cta">
+              {T.demoCta[lang]}
+            </Link>
             <p className="mt-4 text-sm text-black/55 dark:text-white/45">{L.notice[lang]}</p>
           </div>
 

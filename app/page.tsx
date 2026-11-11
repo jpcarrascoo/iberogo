@@ -4,6 +4,7 @@ import ResearchWidget from "@/components/ResearchWidget";
 import PricingWidget from "@/components/PricingWidget";
 import MarketingWidget from "@/components/MarketingWidget";
 import ChatWidget from "@/components/ChatWidget";
+import DemoWidget from "@/components/DemoWidget";
 import LandingHome from "@/components/LandingHome";
 
 export default function Home() {
@@ -27,6 +28,7 @@ export default function Home() {
           <PricingWidget />
           <MarketingWidget />
           <ChatWidget />
+          <DemoWidget />
         </div>
       </section>
 
