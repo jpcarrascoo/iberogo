@@ -22,6 +22,7 @@ import { TIERS } from "./pricing";
 import { AGENT_MAP, ROUTES, TABLES } from "./site";
 import { HARM_CHECKLIST } from "./impact";
 import { ROADMAP_V2 } from "./roadmap";
+import { REGRESSION } from "./regression";
 
 /** The demo order with a real pickup point, used in checks and as the step 2 placeholder. */
 export const DEMO_ORDER = `${DEMO_EXAMPLE} at building b`;
@@ -364,11 +365,17 @@ export function runDemoChecks(): DemoCheck[] {
   const badLinks = AGENT_MAP.filter((a) => !hrefs.includes(a.href)).map((a) => a.href);
   const badTables = AGENT_MAP.flatMap((a) => a.writesTo).filter((t) => !tableNames.includes(t));
   const required = ["/demo", "/dashboard", "/docs"];
+  const notRegressed = hrefs.filter((h) => !REGRESSION.some((r) => r.route === h));
   checks.push({
-    name: "9. Every page is in the navigation; agent map links are real",
-    expected: `${hrefs.length} unique routes incl. /demo, /dashboard, /docs · 0 bad links · 0 unknown tables`,
-    actual: `${new Set(hrefs).size} unique routes${required.every((h) => hrefs.includes(h)) ? " incl. /demo, /dashboard, /docs" : " (missing a required page)"} · ${badLinks.length} bad links · ${badTables.length} unknown tables`,
-    pass: new Set(hrefs).size === hrefs.length && required.every((h) => hrefs.includes(h)) && badLinks.length === 0 && badTables.length === 0,
+    name: "9. Every page is in the navigation and the regression test; agent map links are real",
+    expected: `${hrefs.length} unique routes incl. /demo, /dashboard, /docs · 0 untested pages · 0 bad links · 0 unknown tables`,
+    actual: `${new Set(hrefs).size} unique routes${required.every((h) => hrefs.includes(h)) ? " incl. /demo, /dashboard, /docs" : " (missing a required page)"} · ${notRegressed.length} untested pages · ${badLinks.length} bad links · ${badTables.length} unknown tables`,
+    pass:
+      new Set(hrefs).size === hrefs.length &&
+      required.every((h) => hrefs.includes(h)) &&
+      notRegressed.length === 0 &&
+      badLinks.length === 0 &&
+      badTables.length === 0,
   });
 
   // 10. Every harm row has a passing check behind it; every V2 item has evidence
