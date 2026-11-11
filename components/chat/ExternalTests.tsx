@@ -16,7 +16,7 @@ export const EXTERNAL_TESTS: ExternalTest[] = [
     date: "Nov 6, 2026 · rated 3/5",
     observation:
       "Typed the whole order in one sentence: \u201cid like to have a margherita pizza please at 1:00pm by the main cafeteria\u201d. The assistant found no items, so they had to retype \u201cmargherita pizza\u201d and answer the time and place again. Comment: \u201cIt didn't understand what I ordered, so I don't think it could work well.\u201d",
-    fix: "Polite phrases (\u201cI'd like to have\u2026 please\u201d) are removed before parsing, and a pickup point written inside the order is recognized, so this exact sentence now goes straight to the summary. Logic check 17.",
+    fix: "Polite phrases (\u201cI'd like to have\u2026 please\u201d) are removed before parsing, and a pickup point written inside the order is recognized, so this sentence shape now goes straight to the summary. Logic check 17. (Week 6: the example points were replaced by Building A\u2013D, so \u201cmain cafeteria\u201d is now asked about instead of guessed. Logic check 18.)",
   },
   {
     tester: "Tester 3",

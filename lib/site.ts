@@ -114,3 +114,15 @@ export const HUMAN_REVIEW = {
   href: "/dashboard",
   does: "Reads hand-offs and test results on /dashboard and decides what goes into Version 2. No agent acts on its own.",
 };
+
+// --- Supabase tables (one per saved feature) ---------------------------------------
+
+export const TABLES: { name: string; week: string; label: string; href: string }[] = [
+  { name: "core_outputs", week: "Week 1", label: "Parsed orders", href: "/core" },
+  { name: "research_entries", week: "Week 2", label: "Research notes", href: "/research" },
+  { name: "pricing_scenarios", week: "Week 3", label: "Pricing scenarios", href: "/pricing" },
+  { name: "marketing_assets", week: "Week 4", label: "Saved marketing assets", href: "/marketing" },
+  { name: "ab_votes", week: "Week 4", label: "A/B votes", href: "/marketing" },
+  { name: "chat_sessions", week: "Week 5", label: "Chat sessions", href: "/chat" },
+  { name: "demo_runs", week: "Week 6", label: "Demo runs", href: "/demo" },
+];

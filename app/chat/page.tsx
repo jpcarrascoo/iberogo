@@ -69,9 +69,9 @@ export default function ChatPage() {
   }
 
   async function save(fb: { rating: number | null; comment: string; testerLabel: string }) {
-    const err = await saveSession(summarizeSession(chat.state, chat.messages, fb));
-    if (!err) setRefreshKey((k) => k + 1);
-    return err;
+    const { error } = await saveSession(summarizeSession(chat.state, chat.messages, fb, "chat"));
+    if (!error) setRefreshKey((k) => k + 1);
+    return error;
   }
 
   const showPointsNote = chat.state.step === "q3_point";

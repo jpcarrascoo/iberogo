@@ -62,6 +62,8 @@ export type ChatState = {
   confirmed: boolean;
   handoffReason: string | null;
   guardrails: GuardrailId[]; // every guardrail triggered this session (unique)
+  faqIntents: string[]; // Week 6: every FAQ intent answered this session (unique)
+  unknownPlace: string | null; // Week 6: a place the student named that isn't a pickup point
 };
 
 export type Reply = {
@@ -75,15 +77,16 @@ export type RespondResult = {
   replies: Reply[];
   next: ChatState;
   flags: GuardrailId[]; // guardrails triggered by THIS message
+  faqIntent: string | null; // Week 6: the FAQ intent answered by THIS message, if any
   shownText: string; // the student's message as stored/displayed (redacted)
 };
 
 // --- Fixed data ------------------------------------------------------------------
 
-// Example pickup points until real ones are agreed with campus vendors.
-// The UI labels these "Example pickup points (not final)".
-export const PICKUP_POINTS_ARE_EXAMPLES = true;
-export const PICKUP_POINTS = ["Main cafeteria", "Library entrance", "Main gate"];
+// Week 6: the real pickup points chosen by Jose (they replace the Week 5 examples
+// "Main cafeteria", "Library entrance" and "Main gate").
+export const PICKUP_POINTS_ARE_EXAMPLES = false;
+export const PICKUP_POINTS = ["Building A", "Building B", "Building C", "Building D"];
 
 export const TIME_CHIPS = ["12:00 PM", "1:00 PM", "2:00 PM"];
 
@@ -109,6 +112,7 @@ export const R = {
   q2ConfirmPrompt: "Please answer Yes, or type a different time.",
   q3: "3/3 · Where do you want to pick it up? Choose a point or type one.",
   q3Retry: "Please choose a pickup point, or type a short place name.",
+  q3UnknownPlace: (place: string) => `"${place}" isn't one of the IBEROGO pickup points, so I won't guess.`,
   summaryIntro: "Here's your order. Please check it: nothing counts until you press Confirm.",
   summaryPrompt: "Please press Confirm if the order is right, or Edit to start it again.",
   confirmed:
@@ -177,7 +181,7 @@ export const FAQ: FaqIntent[] = [
     id: "pickup",
     label: "Where and when can I pick up?",
     pattern: /\b(pick ?up (points?|places?|locations?|spots?|times?)|where can i (pick|get|collect)|what times?|which times?|when can i (pick|get|collect))\b/i,
-    answer: `You choose the time and the point yourself. For this demo the example points are: ${PICKUP_POINTS.join(", ")} (not final; real points come once cafeterias join).`,
+    answer: `You choose the time and the point yourself. The pickup points are ${PICKUP_POINTS.slice(0, -1).join(", ")} and ${PICKUP_POINTS[PICKUP_POINTS.length - 1]}.`,
   },
   {
     id: "who",
@@ -299,6 +303,8 @@ export function initialState(): ChatState {
     confirmed: false,
     handoffReason: null,
     guardrails: [],
+    faqIntents: [],
+    unknownPlace: null,
   };
 }
 
@@ -400,6 +406,7 @@ function resetOrder(state: ChatState): ChatState {
     allergyNote: null,
     orderRetries: 0,
     confirmed: false,
+    unknownPlace: null,
   };
 }
 
@@ -416,13 +423,40 @@ export function cleanOrderText(text: string): string {
     .trim();
 }
 
-/** Week 5 fix (External Test, Tester 2): finds a known pickup point written inside the order ("…by the main cafeteria"). */
-export function extractPickupPoint(text: string): { rest: string; point: string | null } {
+/** "Building B" → "B". Every pickup point is a building with a one-letter name. */
+function buildingLetter(point: string): string {
+  return point.slice(-1);
+}
+
+/**
+ * Finds a known pickup point written inside a message ("…pickup at building b").
+ * Week 5 fix (External Test, Tester 2), updated in Week 6 for the real points:
+ * understands "Building B", "bldg B" and "edificio B". An unknown place is NOT
+ * guessed: the assistant asks the pickup-point question instead.
+ */
+export function extractPickupPoint(text: string): { rest: string; point: string | null; unknownPlace: string | null } {
   for (const p of PICKUP_POINTS) {
-    const re = new RegExp(`[,]?\\s*(?:pick(?:ing)? ?(?:it )?up\\s+)?(?:by|at|near|in|from|to)?\\s*(?:the\\s+)?${p.replace(/ /g, "\\s+")}\\b`, "i");
-    if (re.test(text)) return { rest: text.replace(re, " ").replace(/\s+/g, " ").trim(), point: p };
+    const re = new RegExp(
+      `[,]?\\s*(?:pick(?:ing)? ?(?:it )?up\\s+)?(?:by|at|near|in|from|to)?\\s*(?:the\\s+)?(?:building|bldg\\.?|edificio)\\s*${buildingLetter(p)}\\b`,
+      "i"
+    );
+    if (re.test(text)) return { rest: text.replace(re, " ").replace(/\s+/g, " ").trim(), point: p, unknownPlace: null };
   }
-  return { rest: text, point: null };
+  // Week 6: a place that isn't a pickup point ("…by the main cafeteria") is taken out of the
+  // order so the parser doesn't read it as food, and remembered so question 3 can mention it.
+  const other = text.match(UNKNOWN_PLACE_RE);
+  if (other) return { rest: text.replace(UNKNOWN_PLACE_RE, " ").replace(/\s+/g, " ").trim(), point: null, unknownPlace: other[1].trim() };
+  return { rest: text, point: null, unknownPlace: null };
+}
+
+const UNKNOWN_PLACE_RE =
+  /[,]?\s*(?:pick(?:ing)? ?(?:it )?up\s+)?\b(?:by|near|at|in front of|outside|next to)\s+the\s+([a-z][a-z' ]{2,40}?)(?=\s*(?:[,.!?]|$|\b(?:at|around|by|pick ?up)\s+\d))/i;
+
+/** The pickup-point answer at question 3: "Building B", "bldg b", "b" or "edificio B". */
+export function matchPickupAnswer(text: string): string | null {
+  const t = text.trim().toLowerCase().replace(/[.!?]+$/, "");
+  const exact = PICKUP_POINTS.find((p) => p.toLowerCase() === t || buildingLetter(p).toLowerCase() === t);
+  return exact ?? extractPickupPoint(t).point;
 }
 
 const SENSITIVE_CLAUSE_RE =
@@ -453,6 +487,7 @@ function afterTime(next: ChatState, replies: Reply[]) {
     replies.push({ text: R.summaryIntro, summary: currentSummary(next), chips: ["Confirm", "Edit"] });
   } else {
     next.step = "q3_point";
+    if (next.unknownPlace) replies.push({ text: R.q3UnknownPlace(next.unknownPlace) });
     replies.push({ text: R.q3, chips: PICKUP_POINTS });
   }
 }
@@ -467,7 +502,7 @@ function unknownReply(next: ChatState, replies: Reply[], flags: GuardrailId[], s
     replies.push({ text: R.unknown });
   }
   if (again) replies.push({ text: again });
-  return { replies, next, flags, shownText };
+  return { replies, next, flags, faqIntent: null, shownText };
 }
 
 // --- The response function --------------------------------------------------------------
@@ -485,7 +520,7 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
   if (flags.some((g) => STOPPING.includes(g))) {
     const rp = reprompt(next);
     if (rp) replies.push(rp);
-    return { replies, next: { ...next, unknownStreak: 0 }, flags, shownText };
+    return { replies, next: { ...next, unknownStreak: 0 }, flags, faqIntent: null, shownText };
   }
 
   // The rest of the flow only ever sees the redacted text.
@@ -508,7 +543,7 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
     // Nothing left to process (e.g. the message was only a card number or an allergy note).
     const rp = reprompt(next);
     if (rp) replies.push(rp);
-    return { replies, next, flags, shownText };
+    return { replies, next, flags, faqIntent: null, shownText };
   }
 
   // 2. Questions are answered at any step, then the current question is asked again.
@@ -516,16 +551,17 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
   if (faq) {
     replies.push({ text: faq.answer });
     next.unknownStreak = 0;
+    next.faqIntents = [...new Set([...next.faqIntents, faq.id])];
     const rp = reprompt(next);
     replies.push(rp ?? { text: R.doneHint });
-    return { replies, next, flags, shownText };
+    return { replies, next, flags, faqIntent: faq.id, shownText };
   }
 
   if (GREETING_RE.test(text)) {
     replies.push({ text: R.greetingReply });
     const rp = reprompt(next);
     replies.push(rp ?? { text: R.doneHint });
-    return { replies, next: { ...next, unknownStreak: 0 }, flags, shownText };
+    return { replies, next: { ...next, unknownStreak: 0 }, flags, faqIntent: null, shownText };
   }
 
   // 3. Intake steps
@@ -554,6 +590,7 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
       next.items = parsed.items;
       next.orderRetries = 0;
       if (found.point) next.pickupPoint = found.point;
+      next.unknownPlace = found.unknownPlace;
       if (parsed.pickupTimeIso) {
         next.pickupTime = timeFromIso(parsed.pickupTimeIso);
         next.step = "q2_confirm_time";
@@ -596,7 +633,7 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
       break;
     }
     case "q3_point": {
-      const known = PICKUP_POINTS.find((p) => p.toLowerCase() === text.toLowerCase());
+      const known = matchPickupAnswer(text);
       const ok = known ?? (text.length >= 2 && text.length <= 60 && !YES_RE.test(text) && !NO_RE.test(text) ? text : null);
       if (!ok) {
         replies.push({ text: R.q3Retry, chips: PICKUP_POINTS });
@@ -632,7 +669,7 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
   }
 
   next.unknownStreak = 0;
-  return { replies, next, flags, shownText };
+  return { replies, next, flags, faqIntent: null, shownText };
 }
 
 // --- Session summary for storage ------------------------------------------------------
@@ -661,7 +698,11 @@ export type SessionRow = {
   thumbs_down: number;
   rating: number | null;
   comment: string | null;
+  faq_intents: string[]; // Week 6
+  source: ChatSource; // Week 6: 'chat' (/chat) or 'demo' (/demo step 3)
 };
+
+export type ChatSource = "chat" | "demo";
 
 export function outcomeOf(state: ChatState): Outcome {
   if (state.handoffReason) return "handoff";
@@ -678,7 +719,8 @@ export function thumbTally(messages: ChatMessage[]): { up: number; down: number 
 export function summarizeSession(
   state: ChatState,
   messages: ChatMessage[],
-  feedback: { rating: number | null; comment: string; testerLabel: string }
+  feedback: { rating: number | null; comment: string; testerLabel: string },
+  source: ChatSource = "chat"
 ): SessionRow {
   const { up, down } = thumbTally(messages);
   const rating = feedback.rating && feedback.rating >= 1 && feedback.rating <= 5 ? Math.round(feedback.rating) : null;
@@ -696,6 +738,8 @@ export function summarizeSession(
     thumbs_down: down,
     rating,
     comment: redact(feedback.comment.trim()).slice(0, 500) || null,
+    faq_intents: state.faqIntents,
+    source,
   };
 }
 
@@ -910,13 +954,40 @@ export function runChatChecks(): ChatCheck[] {
     pass: notTime.pickupTime === null && notTime.step === "q2_time" && realTimes.every(Boolean),
   });
 
-  // 17. Week 5 fix (External Test, Tester 2): a full one-sentence order is understood
-  const t2 = runConversation(["id like to have a margherita pizza please at 1:00pm by the main cafeteria", "Yes"]).state;
+  // 17. Week 5 fix (External Test, Tester 2): a full one-sentence order is understood.
+  // Week 6: same sentence shape, with a real pickup point instead of the old "main cafeteria" example.
+  const t2 = runConversation(["id like to have a margherita pizza please at 1:00pm by building b", "Yes"]).state;
   checks.push({
     name: "17. Tester 2's one-sentence order is understood",
-    expected: "summary · 1× Margherita Pizza · 1:00 PM · Main cafeteria",
+    expected: "summary · 1× Margherita Pizza · 1:00 PM · Building B",
     actual: `${t2.step} · ${describeItems(t2.items) || "no items"} · ${t2.pickupTime ?? "no time"} · ${t2.pickupPoint ?? "no point"}`,
-    pass: t2.step === "summary" && describeItems(t2.items) === "1× Margherita Pizza" && t2.pickupTime === "1:00 PM" && t2.pickupPoint === "Main cafeteria",
+    pass: t2.step === "summary" && describeItems(t2.items) === "1× Margherita Pizza" && t2.pickupTime === "1:00 PM" && t2.pickupPoint === "Building B",
+  });
+
+  // 18. Week 6: real pickup points. Short answers work; an unknown place is asked about, not guessed.
+  const answers = ["Building C", "bldg c", "c", "edificio C"].map(matchPickupAnswer);
+  const unknownRun = runConversation(["a margherita pizza at 1pm by the main cafeteria", "Yes"]);
+  const unknown = unknownRun.state;
+  checks.push({
+    name: "18. Real pickup points: short answers work, unknown places aren't guessed",
+    expected: "4 of 4 → Building C · unknown place → 1× Margherita Pizza, asks question 3",
+    actual: `${answers.filter((a) => a === "Building C").length} of 4 → Building C · unknown place → ${describeItems(unknown.items)}, ${unknown.step === "q3_point" ? "asks question 3" : `${unknown.step} (${unknown.pickupPoint ?? "no point"})`}`,
+    pass:
+      answers.every((a) => a === "Building C") &&
+      unknown.step === "q3_point" &&
+      unknown.pickupPoint === null &&
+      describeItems(unknown.items) === "1× Margherita Pizza" &&
+      unknownRun.replies.some((r) => r.text.includes("main cafeteria")),
+  });
+
+  // 19. Week 6: FAQ answers are recorded (they tick "asked a question" on /demo)
+  const asked = runConversation(["Is this official IBERO?", "how much does it cost?", "Is this official?"]);
+  const plain = runConversation([DEMO_EXAMPLE]);
+  checks.push({
+    name: "19. Questions are recorded as FAQ intents",
+    expected: "official, pricing · order only → none",
+    actual: `${asked.state.faqIntents.join(", ") || "none"} · order only → ${plain.state.faqIntents.join(", ") || "none"}`,
+    pass: asked.state.faqIntents.join(",") === "official,pricing" && plain.state.faqIntents.length === 0,
   });
 
   return checks;
