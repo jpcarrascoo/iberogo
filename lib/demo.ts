@@ -167,6 +167,11 @@ export function buildDemoRun(input: {
 export const TESTER_TARGET = 5;
 const TESTER_RE = /^tester\s*\d+$/i;
 
+/** "Tester 3" is an external tester; "Software Test 2" or an empty label is not. */
+export function isExternalTester(label: string | null): boolean {
+  return TESTER_RE.test((label ?? "").trim());
+}
+
 export type TestingSummary = {
   testers: number;
   target: number;
