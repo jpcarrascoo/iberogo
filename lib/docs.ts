@@ -180,7 +180,7 @@ export const BUILD_LOGS: BuildLog[] = [
     title: "Integrated venture + impact",
     page: "/demo, /dashboard, /docs",
     goal: "One guided walkthrough, one dashboard of every record, agent map, impact check, V2 roadmap, 5 new testers.",
-    tests: "Demo, chat, pricing and marketing checks in Site health; 5 external testers and the full-site regression on production (see /dashboard).",
+    tests: "Site health 44/44; 3 software tests and the full-site regression (10/10 pages) passed on production, Nov 14, 2026; 5 external testers via /demo (see /dashboard).",
     broke: "An unknown place (\"by the main cafeteria\") was read as part of the food once the example points were replaced.",
     fixed: "Unknown places are taken out and asked about, not guessed (chat check 18).",
     commits: 5,
