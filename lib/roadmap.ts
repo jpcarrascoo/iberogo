@@ -1,7 +1,9 @@
 // Week 6 — Version 2 roadmap.
 //
 // Every item says WHY it's on the list and where that evidence came from.
-// Order = priority. Re-ranked by hand after the 5 external /demo tests.
+// Order = priority. Re-ranked by hand on Nov 18, 2026 after the 5 external /demo tests:
+// real menus moved to #1 (Testers 1 and 2), and a new item tests whether students would
+// pay at all (Tester 2), since 1 of 5 picked "None of these".
 
 export type RoadmapSize = "S" | "M" | "L";
 
@@ -15,18 +17,25 @@ export type RoadmapItem = {
 
 export const ROADMAP_V2: RoadmapItem[] = [
   {
+    id: "menus",
+    title: "Real vendor names and menus",
+    why: "The most asked-for thing in testing. Without a menu, students don't know what they can order, and the parser can't catch a dish that doesn't exist.",
+    source: "External Tester 1 (\"the real menus\") and Tester 2 (asked \"Do you have the menus from all the restaurants?\"), Nov 18, 2026 · Week 1 known limitation",
+    size: "M",
+  },
+  {
+    id: "who-pays",
+    title: "Test who pays: students, vendors, or both",
+    why: "Skipping the line alone may not be worth paying for. Test a free-for-students version where vendors pay per order before pushing Plus.",
+    source: "External Tester 2 (\"I dont think I would pay for not doing a line\"); plan choice: Plus 2, Campus Pass 2, None 1 (Nov 18, 2026) · Week 3 vendor commission = 79% of Base revenue",
+    size: "S",
+  },
+  {
     id: "vendor-pilot",
     title: "Pilot with one real campus vendor",
     why: "Nothing reaches a kitchen today. A real pilot is the only way to learn if vendors will prepare pickup orders on time.",
     source: "Week 2 research (Coco already works with cafeterias) · Week 3 vendor segment",
     size: "L",
-  },
-  {
-    id: "menus",
-    title: "Real vendor names and menus",
-    why: "The parser can't catch a misspelled dish or a dish that doesn't exist, because there is no menu yet.",
-    source: "Week 1 known limitation · FAQ \"What's on the menu?\"",
-    size: "M",
   },
   {
     id: "spanish",

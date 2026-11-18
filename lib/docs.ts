@@ -91,6 +91,15 @@ export const PROMPTS: CodingPrompt[] = [
     commits: ["404a04c"],
   },
   {
+    id: "W6-tester-fix",
+    week: "Week 6",
+    purpose: "Fix what the 5 external testers ran into (Nov 18, 2026)",
+    prompt:
+      "Fix only these, using the testers' exact words as logic checks, and keep the Week 1 parser unchanged: (1) Tester 2 asked \"Do you have the menus from all the restaurants?\" and Tester 3 asked \"How do i order?\"; both got \"I'm not sure\" and the /demo \"Ask your own question\" box didn't tick (0 of 5 testers got it). Add a menu answer and match \"how do I order\"; a real question with no answer must still count as asked, be saved for the builder, and get an honest reply. (2) Tester 5's \"one peperoni pizza, but with no cheese and just a little bit of sauce\" became 3 items; changes like that must be notes on the item. (3) \"Can I pay with cash?\" must not be read as an order, while \"can I get 2 tacos\" still is. Then re-rank the V2 roadmap from the testers' answers.",
+    result: "menu FAQ, how-to-order match, unansweredQuestions, mergeModifierItems/parseChatOrder; chat checks 20–21, demo check 3b; V2 roadmap re-ranked",
+    commits: [],
+  },
+  {
     id: "W6-regression",
     week: "Week 6",
     purpose: "Make sure no page is left out of the full-site regression test",
@@ -180,9 +189,9 @@ export const BUILD_LOGS: BuildLog[] = [
     title: "Integrated venture + impact",
     page: "/demo, /dashboard, /docs",
     goal: "One guided walkthrough, one dashboard of every record, agent map, impact check, V2 roadmap, 5 new testers.",
-    tests: "Site health 44/44; 3 software tests and the full-site regression (10/10 pages) passed on production, Nov 14, 2026; 5 external testers via /demo (see /dashboard).",
-    broke: "An unknown place (\"by the main cafeteria\") was read as part of the food once the example points were replaced.",
-    fixed: "Unknown places are taken out and asked about, not guessed (chat check 18).",
+    tests: "3 software tests and the full-site regression (10/10 pages) passed on production, Nov 14, 2026; 5 of 5 external testers finished /demo on Nov 18 (4 yes, 1 maybe; 4.6/5 useful; 17 min average in line).",
+    broke: "Build: an unknown place was read as part of the food. External tests (Nov 18): 0 of 5 got the question tick, because real questions the bot couldn't answer (\"Do you have the menus…?\", \"How do i order?\") didn't count; \"but with no cheese\" became a separate item; \"Can I pay with cash?\" was read as an order.",
+    fixed: "Unknown places asked about (check 18). Menu and how-to-order answers added; unanswered questions now count, are saved for the builder and get an honest reply; changes like \"but with no cheese\" stay notes on the item; non-order \"Can I…?\" questions are questions (checks 20–21, demo check 3b).",
     commits: 5,
   },
 ];

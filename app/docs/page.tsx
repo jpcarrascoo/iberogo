@@ -61,14 +61,14 @@ export default function DocsPage() {
                         <p className="mt-1 text-black/50 dark:text-white/40">The exact prompt text is in the {p.week} submission document (not copied here).</p>
                       )}
                       <p className="mt-2 text-black/70 dark:text-white/60">Result: {p.result}</p>
-                      <p className="mt-1 flex flex-wrap gap-x-1.5 text-xs text-black/50 dark:text-white/40">
+                      {p.commits.length > 0 && <p className="mt-1 flex flex-wrap gap-x-1.5 text-xs text-black/50 dark:text-white/40">
                         <span>Commits:</span>
                         {p.commits.map((c) => (
                           <a key={c} href={`${GITHUB_URL}/commit/${c}`} target="_blank" rel="noreferrer" className="font-mono hover:text-red-600">
                             {c}
                           </a>
                         ))}
-                      </p>
+                      </p>}
                     </li>
                   ))}
                 </ul>

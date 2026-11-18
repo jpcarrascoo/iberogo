@@ -7,13 +7,12 @@ import {
   openingReplies,
   respond,
   summarizeSession,
-  cleanOrderText,
-  extractPickupPoint,
+  parseChatOrder,
   type ChatMessage,
   type ChatState,
   type Reply,
 } from "@/lib/chat";
-import { parseOrderText, type ParsedOrder } from "@/lib/parseOrder";
+import type { ParsedOrder } from "@/lib/parseOrder";
 import {
   CHECKLIST_ITEMS,
   DEMO_COPY,
@@ -102,8 +101,8 @@ export default function DemoPage() {
   function readOrder() {
     const t = orderDraft.trim();
     if (!t) return;
-    const found = extractPickupPoint(cleanOrderText(t));
-    setParsed({ text: t, order: parseOrderText(found.rest), point: found.point });
+    const r = parseChatOrder(t);
+    setParsed({ text: t, order: r.parsed, point: r.point });
   }
 
   function toggleSkip(k: ChecklistKey) {

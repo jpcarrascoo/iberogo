@@ -76,7 +76,8 @@ export const CHECKLIST_ITEMS: { key: ChecklistKey; label: string; hint: string }
 export function checklistFromChat(state: ChatState, messages: ChatMessage[]): Checklist {
   return {
     order: state.confirmed || state.step === "summary" || state.step === "done",
-    question: state.faqIntents.length > 0,
+    // Week 6 fix: a real question counts even when the assistant had no answer for it.
+    question: state.faqIntents.length > 0 || state.unansweredQuestions.length > 0,
     guardrail: state.guardrails.length > 0 || Boolean(state.handoffReason),
     thumbs: messages.some((m) => m.role === "bot" && (m.thumb === "up" || m.thumb === "down")),
   };
@@ -281,6 +282,16 @@ export function runDemoChecks(): DemoCheck[] {
     expected: "question",
     actual: tickText(c3),
     pass: tickText(c3) === "question",
+  });
+
+  // 3b. Week 6 fix: a real question the assistant can't answer still ticks "question"
+  const uq = runConversation(["Is the food cheaper than the cafeteria?"]);
+  const c3b = checklistFromChat(uq.state, botMessages(uq.replies));
+  checks.push({
+    name: "3b. An unanswered real question still ticks \"question\"",
+    expected: "question",
+    actual: tickText(c3b),
+    pass: tickText(c3b) === "question",
   });
 
   // 4. A guardrail ticks "guardrail"

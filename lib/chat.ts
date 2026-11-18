@@ -14,7 +14,7 @@
 // Everything here is pure (no React, no network) so the "Chat logic checks"
 // panel on /chat can run the exact same functions the UI uses.
 
-import { parseOrderText, type ParsedItem } from "./parseOrder";
+import { parseOrderText, type ParsedItem, type ParsedOrder } from "./parseOrder";
 import { DEMO_EXAMPLE, LANDING } from "./marketing";
 import { TIERS } from "./pricing";
 
@@ -64,6 +64,7 @@ export type ChatState = {
   guardrails: GuardrailId[]; // every guardrail triggered this session (unique)
   faqIntents: string[]; // Week 6: every FAQ intent answered this session (unique)
   unknownPlace: string | null; // Week 6: a place the student named that isn't a pickup point
+  unansweredQuestions: string[]; // Week 6 fix: real questions the assistant had no answer for
 };
 
 export type Reply = {
@@ -136,6 +137,8 @@ export const R = {
     "Got it. I've flagged this chat so a person on the IBEROGO team can review it. There's no live chat yet, so it won't be instant.",
   g8: `That message is a bit long for me (over ${MAX_MESSAGE_LENGTH} characters). Could you send a shorter version?`,
   // Fallback
+  unknownQuestion:
+    "Good question, but I don't have an answer for that yet. I've saved it so the builder can add one. I can help with setting up a pickup order, plans and prices, menus, how IBEROGO works, and whether it's official.",
   unknown:
     "I'm not sure about that one. I can help with setting up a pickup order, plans and prices, how IBEROGO works, and whether it's official.",
   unknownHandoff:
@@ -173,9 +176,18 @@ export const FAQ: FaqIntent[] = [
   {
     id: "how_it_works",
     label: "How does it work?",
-    pattern: /\b(how (does|do) (it|this|iberogo) work|what (is|does) (iberogo|this app|this)( do)?|how it works)\b/i,
+    // Week 6 fix (External Tester 3 asked "How do i order?" and got "I'm not sure").
+    pattern: /\b(how (does|do) (it|this|iberogo) work|what (is|does) (iberogo|this app|this)( do)?|how it works|how (do|can|should) i (order|use (it|this|iberogo)|start)|how to (order|use))\b/i,
     answer:
       "You type your order like a text, choose when and where to pick it up, and walk straight to your food instead of queuing. Today it's a prototype: the order isn't sent to a cafeteria yet.",
+  },
+  {
+    // Week 6 fix (External Tester 2 asked "Do you have the menus from all the restaurants?").
+    id: "menu",
+    label: "What's on the menu?",
+    pattern: /\b(menus?|what('s| is) (there )?to eat|what (food|can i (order|get|eat))|which (restaurants?|cafeterias?|vendors?)|restaurants?)\b/i,
+    answer:
+      "Not yet: no cafeteria has joined, so there are no real menus. For now you can type any food and the demo will read it. Real menus from campus vendors are next on the Version 2 roadmap.",
   },
   {
     id: "pickup",
@@ -305,6 +317,7 @@ export function initialState(): ChatState {
     guardrails: [],
     faqIntents: [],
     unknownPlace: null,
+    unansweredQuestions: [],
   };
 }
 
@@ -423,6 +436,36 @@ export function cleanOrderText(text: string): string {
     .trim();
 }
 
+/**
+ * Week 6 fix (External Tester 5): "one peperoni pizza, but with no cheese and just a little bit
+ * of sauce" became 3 items ("But With No Cheese", "Just A Little Bit Of Sauce"). The Week 1
+ * parser stays unchanged; here, an "item" that is really a change to the previous item
+ * (starts with but / with / without / no / just / extra / less / more / light / add / hold)
+ * becomes a note on that item instead.
+ */
+const MODIFIER_RE = /^(but|with|without|w\/o|no|not|just|only|extra|less|more|light|lightly|easy on|hold|add|plus|a (little|bit)|little|half)\b/i;
+
+export function mergeModifierItems(items: ParsedItem[]): ParsedItem[] {
+  const out: ParsedItem[] = [];
+  for (const it of items) {
+    const prev = out[out.length - 1];
+    if (prev && MODIFIER_RE.test(it.name.trim())) {
+      const note = it.name.trim().toLowerCase().replace(/^but\s+/, "") + (it.notes ? `; ${it.notes}` : "");
+      prev.notes = prev.notes ? `${prev.notes}; ${note}` : note;
+    } else {
+      out.push({ ...it });
+    }
+  }
+  return out;
+}
+
+/** Everything the chat and /demo do to read an order: clean it, find the pickup point, parse, merge modifiers. */
+export function parseChatOrder(text: string): { parsed: ParsedOrder; point: string | null; unknownPlace: string | null } {
+  const found = extractPickupPoint(cleanOrderText(text));
+  const parsed = parseOrderText(found.rest);
+  return { parsed: { ...parsed, items: mergeModifierItems(parsed.items) }, point: found.point, unknownPlace: found.unknownPlace };
+}
+
 /** "Building B" → "B". Every pickup point is a building with a one-letter name. */
 function buildingLetter(point: string): string {
   return point.slice(-1);
@@ -494,12 +537,16 @@ function afterTime(next: ChatState, replies: Reply[]) {
 
 function unknownReply(next: ChatState, replies: Reply[], flags: GuardrailId[], shownText: string, again: string | null): RespondResult {
   next.unknownStreak += 1;
+  // Week 6 fix (External Testers 2 and 3): a real question with no answer still counts as a
+  // question. It's saved for the builder, and the reply says so instead of only "I'm not sure".
+  const isQuestion = looksLikeQuestion(shownText);
+  if (isQuestion) next.unansweredQuestions = [...next.unansweredQuestions, shownText.slice(0, 200)];
   if (next.unknownStreak >= 2) {
     if (!next.handoffReason) next.handoffReason = "Assistant couldn't answer 2 messages in a row";
     replies.push({ text: R.unknownHandoff });
     next.unknownStreak = 0;
   } else {
-    replies.push({ text: R.unknown });
+    replies.push({ text: isQuestion ? R.unknownQuestion : R.unknown });
   }
   if (again) replies.push({ text: again });
   return { replies, next, flags, faqIntent: null, shownText };
@@ -567,15 +614,15 @@ export function respond(state: ChatState, rawMessage: string): RespondResult {
   // 3. Intake steps
   switch (next.step) {
     case "q1_order": {
-      if (looksLikeQuestion(text) && !/^(can|could|may) i\b/i.test(text)) {
+      // "Can I get 2 tacos" is an order; "Can I pay with cash?" is a question (Week 6 fix).
+      if (looksLikeQuestion(text) && !/^(can|could|may) i (get|have|order|grab|take)\b/i.test(text)) {
         return unknownReply(next, replies, flags, shownText, R.q1);
       }
       if (YES_RE.test(text) || NO_RE.test(text)) {
         replies.push({ text: R.q1 });
         break;
       }
-      const found = extractPickupPoint(cleanOrderText(text));
-      const parsed = parseOrderText(found.rest);
+      const { parsed, ...found } = parseChatOrder(text);
       if (parsed.items.length === 0) {
         next.orderRetries += 1;
         if (next.orderRetries >= 2) {
@@ -738,7 +785,7 @@ export function summarizeSession(
     thumbs_down: down,
     rating,
     comment: redact(feedback.comment.trim()).slice(0, 500) || null,
-    faq_intents: state.faqIntents,
+    faq_intents: state.unansweredQuestions.length ? [...state.faqIntents, "unanswered"] : state.faqIntents,
     source,
   };
 }
@@ -988,6 +1035,36 @@ export function runChatChecks(): ChatCheck[] {
     expected: "official, pricing · order only → none",
     actual: `${asked.state.faqIntents.join(", ") || "none"} · order only → ${plain.state.faqIntents.join(", ") || "none"}`,
     pass: asked.state.faqIntents.join(",") === "official,pricing" && plain.state.faqIntents.length === 0,
+  });
+
+  // 20. Week 6 fix (External Testers 2 + 3): their real questions, word for word
+  const menuQ = runConversation(["Do you have the menus from all the restaurants?"]).state;
+  const howQ = runConversation(["How do i order?"]).state;
+  const otherQ = runConversation(["Is the food cheaper than the cafeteria?"]);
+  const cash = runConversation(["Can I pay with cash?"]).state;
+  checks.push({
+    name: "20. Testers' real questions are answered or saved, never just dropped",
+    expected: "menu · how_it_works · unanswered question saved (1) with a 'saved' reply · \"Can I pay with cash?\" isn't an item",
+    actual: `${menuQ.faqIntents.join(",") || "none"} · ${howQ.faqIntents.join(",") || "none"} · unanswered question saved (${otherQ.state.unansweredQuestions.length})${otherQ.replies.some((r) => r.text.includes("I've saved it")) ? " with a 'saved' reply" : ""} · ${cash.items.length ? `item "${cash.items[0].name}"` : "\"Can I pay with cash?\" isn't an item"}`,
+    pass:
+      cash.items.length === 0 &&
+      menuQ.faqIntents.join(",") === "menu" &&
+      howQ.faqIntents.join(",") === "how_it_works" &&
+      otherQ.state.unansweredQuestions.length === 1 &&
+      otherQ.replies.some((r) => r.text.includes("I've saved it")),
+  });
+
+  // 21. Week 6 fix (External Tester 5): changes to an item stay on that item
+  const t5 = runConversation(["one peperoni pizza, but with no cheese and just a little bit of sauce, pickup at 1 pm in building a"]).state;
+  checks.push({
+    name: "21. Tester 5's \"but with no cheese\" stays a note on the pizza",
+    expected: "1× Peperoni Pizza (with no cheese; just a little bit of sauce) · Building A",
+    actual: `${t5.items.map((i) => `${i.quantity}× ${i.name}${i.notes ? ` (${i.notes})` : ""}`).join(", ") || "no items"} · ${t5.pickupPoint ?? "no point"}`,
+    pass:
+      t5.items.length === 1 &&
+      t5.items[0].name === "Peperoni Pizza" &&
+      t5.items[0].notes === "with no cheese; just a little bit of sauce" &&
+      t5.pickupPoint === "Building A",
   });
 
   return checks;
